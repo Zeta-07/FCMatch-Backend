@@ -6,7 +6,7 @@ Verificación local original: 04/11/2026. Revisión de publicación autorizada: 
 
 **Base técnica implementada y verificada localmente.** API y los tres clientes ejecutables, PostgreSQL real, configuración por entorno, diseño compartido y controles técnicos satisfactorios. **El propietario confirmó personalmente que Engram y Google Stitch funcionan correctamente**; ese punto está resuelto y no se repite su comprobación. La conexión externa a R2 sigue pendiente por la elección de entorno local.
 
-No se implementó Fase 1 ni ninguna operación de cuentas, torneos o administración del propietario. El propietario autorizó guardar y publicar la Fase 0 en los tres repositorios, inicializar `main`, `develop` y `feature/fase-0` con un ancestro común y abrir PR hacia `develop` únicamente tras comprobar CI satisfactorio. No autorizó fusionar los PR. Los resultados remotos se registrarán en este informe cuando estén comprobados.
+No se implementó Fase 1 ni ninguna operación de cuentas, torneos o administración del propietario. Con autorización del propietario se publicaron `main`, `develop` y `feature/fase-0` con un ancestro común por repositorio. Tras comprobar CI satisfactorio en las tres ramas de trabajo se abrieron los PR hacia `develop`. Los PR permanecen abiertos y no se han fusionado.
 
 ## Diez pasos
 
@@ -15,7 +15,7 @@ No se implementó Fase 1 ni ninguna operación de cuentas, torneos o administrac
 3. **API y clientes:** Express + TypeScript estricto; clientes Angular + Ionic separados. Rutas técnicas propias: `/estado`, `/inicio`, `/sistema`. Capacitor configurado solo en móvil. Build y ejecución verificados.
 4. **PostgreSQL y migraciones:** instancia local loopback `5433`, bases desarrollo/pruebas separadas, usuario de aplicación sin superusuario, esquema inicial y migraciones versionadas. PostgreSQL real, UTC y repetición de migraciones probados.
 5. **OpenAPI y configuración:** `/api/v1/health`, modelos generados idénticos, errores uniformes en español, Zod y variables por entorno. Validación OpenAPI, tipos y pruebas HTTP satisfactorias.
-6. **Calidad y CI:** ESLint, Stylelint, control de colores en plantillas, Prettier, build, pruebas de API/integración/navegador y workflows por repositorio. Controles locales satisfactorios; publicación autorizada y ejecución remota pendiente de resultado.
+6. **Calidad y CI:** ESLint, Stylelint, control de colores en plantillas, Prettier, build, pruebas de API/integración/navegador y workflows por repositorio. Controles locales y ejecución remota satisfactorios; enlaces de evidencia al final del informe.
 7. **Engram y Google Stitch:** instalados e integrados, con habilidades de diseño y clave externa al repositorio. Funcionamiento comprobado personalmente por el propietario; pendiente cerrado sin repetir pruebas.
 8. **Logo:** copias binarias del original en los tres clientes y favicon referenciado al mismo PNG. Identidad por SHA256 y carga en navegador verificadas.
 9. **Diseño compartido:** componentes, temas y estilos responsivos distribuidos sin imports entre repositorios. Oscuro inicial, claro persistente y aplicado antes del render. Sincronización por hash y recorridos desktop/móvil satisfactorios.
@@ -58,7 +58,7 @@ Al terminar se detuvieron los procesos de API, capturador SMTP y PostgreSQL inic
 
 - **API ejecutable y conectada a PostgreSQL:** cumplido.
 - **Clientes ejecutables y capaces de comunicarse con ella:** cumplido en los tres clientes, mediante pruebas reales de navegador.
-- **Configuración documentada y reproducible:** scripts, `.env.example`, lockfiles, versiones y READMEs preparados. No se ha ejecutado una instalación desde cero en otra máquina ni CI remota.
+- **Configuración documentada y reproducible:** scripts, `.env.example`, lockfiles, versiones y READMEs preparados. GitHub Actions completó `npm ci` y los controles en runners Linux independientes para los cuatro paquetes.
 - **Tema oscuro y claro operativo:** cumplido, con persistencia y revisión responsiva.
 - **Comprobaciones técnicas iniciales satisfactorias:** cumplido para el entorno local. Engram y Google Stitch confirmados por el propietario; límites externos detallados a continuación.
 
@@ -66,7 +66,7 @@ Al terminar se detuvieron los procesos de API, capturador SMTP y PostgreSQL inic
 
 1. **Engram y Google Stitch:** comprobados personalmente por el propietario. No queda pendiente de reinicio ni de nueva verificación para el cierre de Fase 0.
 2. **R2:** falta bucket privado y credenciales de desarrollo. Se dejó preparado el adaptador; no se simula el servicio ni se afirma conectividad. El usuario eligió entorno local para esta entrega.
-3. **CI remota y PR:** publicación autorizada el 05/11/2026. Los workflows se ejecutan al publicar las ramas; los PR se abrirán solo tras obtener resultados satisfactorios. Los enlaces y conclusiones comprobadas se incorporarán abajo.
+3. **Revisión e integración:** CI de publicación satisfactorio y tres PR abiertos hacia `develop`. Falta la revisión y aprobación del propietario; no se ha realizado ninguna fusión. Las comprobaciones de los PR se consultan en sus enlaces antes de integrar.
 4. **Compatibilidad:** TypeScript 7.0.2 está publicado, pero Angular compiler-cli 22 y typescript-eslint no lo admiten. Se usa 6.0.3, con explicación en los tres documentos de decisiones.
 5. **Logo:** Angular emite en desarrollo un aviso de tamaño intrínseco superior al renderizado. Se conserva el PNG original, sin recortarlo ni modificarlo. No impide las compilaciones ni pruebas.
 6. **Scripts opcionales npm:** npm 12 bloquea por defecto ciertos scripts de dependencias nativas opcionales; build y pruebas funcionaron con los paquetes precompilados disponibles. No se habilitó ejecución indiscriminada de scripts.
@@ -84,8 +84,22 @@ Las compilaciones Android/iOS, el despliegue público y el correo transaccional 
 
 ## Publicación y revisión remota
 
-La revisión previa encontró los tres remotos oficiales vacíos, sin ramas ni commits. Se prepara un commit raíz de documentación por repositorio como ancestro común de `main` y `develop`; la implementación se conserva en `feature/fase-0`. No se sobrescribe trabajo remoto ni se utiliza force push. Las ramas base no incluyen workflows hasta la integración revisada de la Fase 0.
+La revisión previa encontró los tres remotos oficiales vacíos, sin ramas ni commits. Se creó un commit raíz de documentación por repositorio como ancestro común de `main`, `develop` y `feature/fase-0`; la implementación se conserva en commits posteriores de `feature/fase-0`. `main` es la rama predeterminada. No se sobrescribió trabajo remoto ni se utilizó force push. Las ramas base no incluyen workflows hasta la integración revisada de la Fase 0.
 
 Se revisan los archivos candidatos antes de cada commit: `.env`, `.local/`, dependencias instaladas, compilaciones y resultados de pruebas permanecen excluidos. Las plantillas contienen ejemplos; Stitch referencia una variable de entorno y la contraseña de PostgreSQL en CI pertenece únicamente al servicio efímero.
 
-Estado de ejecución remota: pendiente de publicación y comprobación. Este apartado se actualizará con los enlaces verificables, sin atribuir éxito a ejecuciones aún no terminadas.
+### Evidencia de CI de publicación comprobada
+
+- **Backend**, commit `b8a8cfe`: [Calidad de la API — satisfactorio](https://github.com/Zeta-07/FCMatch-Backend/actions/runs/42041887066). Instalación reproducible, migraciones PostgreSQL, generación OpenAPI sin diferencias, tipos, lint, formato, cinco pruebas HTTP/configuración, dos pruebas de integración, build y auditoría satisfactorios.
+- **AdminWeb**, commit `ae9fd0c`: [Calidad de AdminWeb — satisfactorio](https://github.com/Zeta-07/FCMatch-AdminWeb/actions/runs/42041889775). Instalación reproducible, lint de código y colores, formato, build, dos recorridos Playwright y auditoría satisfactorios.
+- **Frontend**, commit `2c3175c`: [Calidad de los clientes — satisfactorio](https://github.com/Zeta-07/FCMatch-Frontend/actions/runs/42041888095). Ambos jobs (`web` y `mobile`) completaron instalación, sincronización de diseño, lint, formato, build, dos recorridos Playwright por aplicación y auditoría satisfactoriamente.
+
+En CI de los clientes se usa el contrato interceptado explícito de health; la integración real de PostgreSQL y SMTP pertenece al job del backend. Las ejecuciones anteriores acreditan los commits indicados; cualquier actualización posterior genera comprobaciones nuevas cuyo resultado se consulta en GitHub, sin atribuirles anticipadamente éxito.
+
+### Pull Requests abiertos
+
+- [Backend — PR #1](https://github.com/Zeta-07/FCMatch-Backend/pull/1).
+- [AdminWeb — PR #1](https://github.com/Zeta-07/FCMatch-AdminWeb/pull/1).
+- [Frontend — PR #1](https://github.com/Zeta-07/FCMatch-Frontend/pull/1).
+
+Los tres proponen `feature/fase-0` hacia `develop` y están asignados a `Zeta-07`. Se intentó solicitar también su revisión; GitHub lo rechazó con HTTP 422 porque `Zeta-07` es el autor de los PR. La revisión del propietario sigue pendiente y ninguno se fusionó.
