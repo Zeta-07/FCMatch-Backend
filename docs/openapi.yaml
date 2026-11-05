@@ -1,0 +1,66 @@
+openapi: 3.1.0
+info:
+  title: FCMatch API
+  version: 0.0.0
+  description: Contrato de infraestructura de la Fase 0. No incluye operaciones de negocio.
+  license:
+    name: Uso privado del proyecto
+    identifier: LicenseRef-FCMatch-Private
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Desarrollo local
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Verificar API y conectividad PostgreSQL
+      security: []
+      responses:
+        '200':
+          description: API y base de datos disponibles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          description: Base de datos no disponible
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '429':
+          description: Límite de solicitudes excedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+components:
+  schemas:
+    Health:
+      type: object
+      required: [status, service, database]
+      properties:
+        status:
+          type: string
+          const: ok
+        service:
+          type: string
+          const: fcmatch-api
+        database:
+          type: string
+          const: connected
+    ApiError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, details]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            details:
+              type: array
+              items: {}
