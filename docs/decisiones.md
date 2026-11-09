@@ -1,5 +1,9 @@
 # Decisiones técnicas — Fase 0
 
+## DT-007 — Catálogo portable de skills OpenCode
+
+El propietario aprueba publicar las seis skills existentes y revisadas antes de autorizar Fase 1. Backend aloja una única copia en `.opencode/skills/`, con catálogo HTTP, fuentes fijadas, licencias y SHA256. Frontend y AdminWeb consumen los mismos archivos desde GitHub con SHA completo en su configuración OpenCode, sin rutas personales, archivos duplicados ni imports de código de aplicación entre repositorios. El catálogo es una herramienta de desarrollo y no se sirve desde la API. `skills:check` valida integridad y catálogo en CI; los originales quedan excluidos del formateo y de conversión de saltos de línea. No se añaden plugins, MCP, permisos ni dependencias. Guía y límites en `docs/skills-opencode.md` y `docs/skills-policy.md`; referencias cruzadas: DT-008 de Frontend y DT-007 de AdminWeb. Las tres skills locales de Stitch se preservan sin republicarlas. Fase 1 no iniciada.
+
 ## DT-001 — Angular + Ionic en los tres clientes
 
 Decisión expresa del propietario: Web Cliente, móvil y AdminWeb usan Angular + Ionic; Capacitor únicamente en móvil. Se actualizaron solo las referencias técnicas de AGENTS, DERCAS y plan. Los requisitos funcionales y reglas de negocio se conservan. La misma decisión consta en los documentos de decisiones de `FCMatch-Frontend` y `FCMatch-AdminWeb`.
