@@ -1,0 +1,38 @@
+name: Calidad de la API
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_USER: fcmatch
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: fcmatch
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fcmatch"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '26.13.0'
+          cache: npm
+      - run: npm install --global npm@12.2.1
+      - run: npm ci
+      - name: Preparar bases aisladas y entorno efímero
+        run: node scripts/prepare-ci.mjs
+        env:
+          DATABASE_URL: postgresql://fcmatch:ci-only-password@localhost:5432/fcmatch
+      - run: npm run db:migrate
+      - run: npm run api:generate
+      - run: git diff --exit-code -- src/shared/api
+      - run: npm run check
+      - run: npm audit --audit-level=low
