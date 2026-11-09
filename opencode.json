@@ -1,5 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "instructions": ["docs/skills-policy.md"],
   "mcp": {
     "stitch": {
       "type": "remote",

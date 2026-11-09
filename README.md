@@ -43,6 +43,8 @@ R2 usa el SDK S3 oficial, región `auto` y endpoint de Cloudflare. Sin credencia
 
 ## MCP
 
+Las seis skills OpenCode aprobadas se mantienen en un [catálogo compartido y portable](docs/skills-opencode.md), con una sola copia en este repositorio. Frontend y AdminWeb lo consumen por HTTPS desde una revisión Git fijada. Verificación: `npm run skills:check`.
+
 `opencode.json` registra Google Stitch usando `STITCH_API_KEY`; Engram está instalado globalmente para OpenCode. No hay claves en estos archivos. Reinicia OpenCode tras cambiar configuración y comprueba `opencode mcp list`.
 
 Pruebas técnicas independientes:

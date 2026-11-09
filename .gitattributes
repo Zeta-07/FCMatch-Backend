@@ -1,0 +1,2 @@
+# Preserve reviewed third-party skill bytes for SHA256 checks on every platform.
+.opencode/skills/** -text -whitespace

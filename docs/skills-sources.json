@@ -1,0 +1,38 @@
+[
+  {
+    "id": "angular-developer",
+    "repository": "angular/skills",
+    "commit": "a4b55f012e98da6ed30d45381db1476680d270c5",
+    "directory": "angular-developer"
+  },
+  {
+    "id": "ionic-design",
+    "repository": "cap-go/capacitor-skills",
+    "commit": "e90bb5639130e34387f00bf0a95c6d47e4a2ebb8",
+    "directory": "skills/ionic-design"
+  },
+  {
+    "id": "capacitor-best-practices",
+    "repository": "cap-go/capacitor-skills",
+    "commit": "e90bb5639130e34387f00bf0a95c6d47e4a2ebb8",
+    "directory": "skills/capacitor-best-practices"
+  },
+  {
+    "id": "supabase-postgres-best-practices",
+    "repository": "supabase/agent-skills",
+    "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+    "directory": "skills/supabase-postgres-best-practices"
+  },
+  {
+    "id": "playwright-cli",
+    "repository": "microsoft/playwright-cli",
+    "commit": "9166133dd68a4ba30ac959fade685e7c907e8629",
+    "directory": "skills/playwright-cli"
+  },
+  {
+    "id": "security-review",
+    "repository": "github/awesome-copilot",
+    "commit": "e45ee935ed0b57992ad7b4e07dbea5cb534786f0",
+    "directory": "skills/security-review"
+  }
+]
