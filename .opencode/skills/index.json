@@ -1,0 +1,153 @@
+{
+  "skills": [
+    {
+      "name": "angular-developer",
+      "version": "1fe95b626c13d40f9d3a8310f46b67b190a1f319ebebb4d52c4d579fd0b10327",
+      "files": [
+        "SKILL.md",
+        "references/angular-animations.md",
+        "references/angular-aria.md",
+        "references/cli.md",
+        "references/component-harnesses.md",
+        "references/component-styling.md",
+        "references/components.md",
+        "references/creating-services.md",
+        "references/data-resolvers.md",
+        "references/deferrable-views.md",
+        "references/define-routes.md",
+        "references/defining-providers.md",
+        "references/di-fundamentals.md",
+        "references/e2e-testing.md",
+        "references/effects.md",
+        "references/environment-configuration.md",
+        "references/hierarchical-injectors.md",
+        "references/host-elements.md",
+        "references/http-client.md",
+        "references/injection-context.md",
+        "references/inputs.md",
+        "references/linked-signal.md",
+        "references/loading-strategies.md",
+        "references/mcp.md",
+        "references/migrations.md",
+        "references/naming-conventions.md",
+        "references/navigate-to-routes.md",
+        "references/outputs.md",
+        "references/pipes.md",
+        "references/queries-and-projection.md",
+        "references/reactive-forms.md",
+        "references/rendering-strategies.md",
+        "references/resource.md",
+        "references/route-animations.md",
+        "references/route-guards.md",
+        "references/router-lifecycle.md",
+        "references/router-testing.md",
+        "references/server-side-rendering.md",
+        "references/show-routes-with-outlets.md",
+        "references/signal-forms.md",
+        "references/signals-overview.md",
+        "references/tailwind-css.md",
+        "references/template-driven-forms.md",
+        "references/testing-fundamentals.md"
+      ]
+    },
+    {
+      "name": "ionic-design",
+      "version": "62e1b8643d9a21f77997d222c644dfa1d60d6a425c3b11e57b376e629c6ad47d",
+      "files": [
+        "SKILL.md",
+        "metadata.json",
+        "references/components.md",
+        "references/ionic-9-migration.md",
+        "references/theming.md",
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "capacitor-best-practices",
+      "version": "8fe94e70a7b384d6d997e92c8638efd8b1a4756aad9cc9e140584648d032d8a1",
+      "files": [
+        "SKILL.md",
+        "metadata.json",
+        "references/config-and-project.md",
+        "references/native-projects.md",
+        "references/plugins.md",
+        "references/release-checklist.md",
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "supabase-postgres-best-practices",
+      "version": "aa35113fcfbff2eff3aae077eb7eb2ddaae92cf75cd89f95623cb2e5b0993ff6",
+      "files": [
+        "CHANGELOG.md",
+        "SKILL.md",
+        "references/_contributing.md",
+        "references/_sections.md",
+        "references/_template.md",
+        "references/advanced-full-text-search.md",
+        "references/advanced-jsonb-indexing.md",
+        "references/conn-idle-timeout.md",
+        "references/conn-limits.md",
+        "references/conn-pooling.md",
+        "references/conn-prepared-statements.md",
+        "references/data-batch-inserts.md",
+        "references/data-n-plus-one.md",
+        "references/data-pagination.md",
+        "references/data-upsert.md",
+        "references/lock-advisory.md",
+        "references/lock-deadlock-prevention.md",
+        "references/lock-short-transactions.md",
+        "references/lock-skip-locked.md",
+        "references/monitor-explain-analyze.md",
+        "references/monitor-pg-stat-statements.md",
+        "references/monitor-vacuum-analyze.md",
+        "references/query-composite-indexes.md",
+        "references/query-covering-indexes.md",
+        "references/query-index-types.md",
+        "references/query-missing-indexes.md",
+        "references/query-partial-indexes.md",
+        "references/schema-constraints.md",
+        "references/schema-data-types.md",
+        "references/schema-foreign-key-indexes.md",
+        "references/schema-lowercase-identifiers.md",
+        "references/schema-partitioning.md",
+        "references/schema-primary-keys.md",
+        "references/security-privileges.md",
+        "references/security-rls-basics.md",
+        "references/security-rls-performance.md",
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "playwright-cli",
+      "version": "8679eb467d0402e5f08100eab295dde9aceb310a542a2e165d54cfcc9a5e88df",
+      "files": [
+        "SKILL.md",
+        "references/element-attributes.md",
+        "references/playwright-tests.md",
+        "references/pr-attachments.md",
+        "references/request-mocking.md",
+        "references/running-code.md",
+        "references/session-management.md",
+        "references/storage-state.md",
+        "references/test-generation.md",
+        "references/tracing.md",
+        "references/video-recording.md",
+        "LICENSE"
+      ]
+    },
+    {
+      "name": "security-review",
+      "version": "0f66ce7c0cfef7146c5abd6ff277109c25697da42c6a6b05eacda86bd680553b",
+      "files": [
+        "SKILL.md",
+        "references/language-patterns.md",
+        "references/report-format.md",
+        "references/secret-patterns.md",
+        "references/vuln-categories.md",
+        "references/vulnerable-packages.md",
+        "LICENSE"
+      ]
+    }
+  ]
+}

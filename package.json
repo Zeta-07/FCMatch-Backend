@@ -22,7 +22,8 @@
     "infra:check": "node --env-file=.env --import tsx scripts/check-connections.ts",
     "api:lint": "redocly lint docs/openapi.yaml",
     "api:generate": "openapi-ts -i ./docs/openapi.yaml -o src/shared/api -p @hey-api/typescript",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run api:lint && npm test && npm run test:integration && npm run build"
+    "skills:check": "node scripts/manage-opencode-skills.mjs --check",
+    "check": "npm run skills:check && npm run typecheck && npm run lint && npm run format:check && npm run api:lint && npm test && npm run test:integration && npm run build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1162.0",

@@ -1,0 +1,618 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "angular-developer",
+      "repository": "angular/skills",
+      "commit": "a4b55f012e98da6ed30d45381db1476680d270c5",
+      "directory": "angular-developer",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "ec8d1925e160cf524f643880711ea70a706ff9974f66f6718d7651f1be388cc5",
+          "gitBlob": "d6696a50f8216c16c256d72f34e1f6b1adb4bd17"
+        },
+        {
+          "path": "references/angular-animations.md",
+          "sha256": "f21b798ed93e27318527ef7e74e63ef8c71cb74ff2b010d70dbb429883f0dbd0",
+          "gitBlob": "4abc961a61197b92bfe5c4af2bb90a9bfddf8532"
+        },
+        {
+          "path": "references/angular-aria.md",
+          "sha256": "fff4cbdf3558beacfeb03a243d874cacb16a24b0c78962c4f9c760fc2cbe5ad8",
+          "gitBlob": "6c618a8b335af5626b68feb34bf4926fb4fdc030"
+        },
+        {
+          "path": "references/cli.md",
+          "sha256": "f4369df38e131b5f75feb81beafcdfefdcf09d72ebf5fde5d9fb8d6477e8edc1",
+          "gitBlob": "31d0a64a3f5fb3fe7b1dd80bd4201adaca26daec"
+        },
+        {
+          "path": "references/component-harnesses.md",
+          "sha256": "1761d33a65ecde690ca0c57081ff9d5871cafb8ff724738ccd711b5018e2d894",
+          "gitBlob": "384c5baac1b0917b60e2bf1958f1ced68611e0db"
+        },
+        {
+          "path": "references/component-styling.md",
+          "sha256": "de3351fdb72174361c6eee150940193f20d148afaceab0f22107758a3cb2d787",
+          "gitBlob": "3a1c222aeba86d304384ad9a1ed488c57d8f007b"
+        },
+        {
+          "path": "references/components.md",
+          "sha256": "37c05479e7cc1882e766870f359b532d650fa4501d549faf5275e80edcde1d69",
+          "gitBlob": "fad773adc294f059beefbf6ae642467b723c9317"
+        },
+        {
+          "path": "references/creating-services.md",
+          "sha256": "1fc1d46bd26568d07d1500d0b9ba1a2556ca4a11f4a3dc11036ae5b16dea80cc",
+          "gitBlob": "92b5a757e39c3b287bfcb23313ce921f23490fda"
+        },
+        {
+          "path": "references/data-resolvers.md",
+          "sha256": "bd5d7b7c3f6f7d85c45442efa79896e61b399a01a733450fc33395cf3761e2d7",
+          "gitBlob": "abff11f8fd2ce0227781db7eca40426598cdd292"
+        },
+        {
+          "path": "references/deferrable-views.md",
+          "sha256": "7893b4f99569827a6be90588c99a80a8324530a60607f0e6627004467aa484c2",
+          "gitBlob": "67ccb128fa9efef51ed34ff891b01843e0a2b314"
+        },
+        {
+          "path": "references/define-routes.md",
+          "sha256": "4e80613931ecf4da957f9ff45343869b1651331ff4c8b955f2698b9ac0afc921",
+          "gitBlob": "72552038ac82e4a434aa8b57f7c4dc678a1c6b80"
+        },
+        {
+          "path": "references/defining-providers.md",
+          "sha256": "e654c23a080c642cf7031b5cc5de1101b8c75030c15256f7e3b81b0336953c6d",
+          "gitBlob": "544b63ac3c1b084d6bdc62f747e7fd7234de1b86"
+        },
+        {
+          "path": "references/di-fundamentals.md",
+          "sha256": "ed5e4004aed214429de091d2b041cfd818c77a0ebfa24c23f01ec9bac7118a78",
+          "gitBlob": "fad759bb877b212aff0a311717cc43efd5ce5aee"
+        },
+        {
+          "path": "references/e2e-testing.md",
+          "sha256": "fd11d930ed081ca934fe83df06c9d965257ec817ebef59b918d4d814a65feca6",
+          "gitBlob": "75afd570c7729cf8242486032870256e4520ea17"
+        },
+        {
+          "path": "references/effects.md",
+          "sha256": "5df4759be70248a1f282aff3060b04b694f05ae78093a5caa4eaff455e35a6a3",
+          "gitBlob": "cff11a51075047f765073427411737e347d44c09"
+        },
+        {
+          "path": "references/environment-configuration.md",
+          "sha256": "788b62bf5e04d56343f598437f7e3fd7fdfc6efa8ec6727288dc73514b1b5a76",
+          "gitBlob": "8276df200aaaa4247b046d2872efca7cd1be5453"
+        },
+        {
+          "path": "references/hierarchical-injectors.md",
+          "sha256": "967e472a1208c6e1f4b95bf7ee9162165904eb78ac6dab64643c67a9d1dac264",
+          "gitBlob": "ccfbcdafea285b73ffe060b3d3b93f7f6d600c65"
+        },
+        {
+          "path": "references/host-elements.md",
+          "sha256": "5c2eb324e7b84bd81334b6d262a61b873de208640aabe4be48b73600438bdaed",
+          "gitBlob": "939161f1e159e04acd9678f49767a41450ba4092"
+        },
+        {
+          "path": "references/http-client.md",
+          "sha256": "b6a6c92ae71dc98b6cd0e2b840227c7743b3edf288769da3db070fa1815c1adc",
+          "gitBlob": "430639ff3bf17d2225b637c598e43d4dc276130b"
+        },
+        {
+          "path": "references/injection-context.md",
+          "sha256": "4435dfcec91bd9fb68d6c318802cac1b37424d4e76452e6f0f52ed0d2b6536fb",
+          "gitBlob": "c62d2ee34f541afdf7b42e4ea46f49b8ed8c5ee8"
+        },
+        {
+          "path": "references/inputs.md",
+          "sha256": "f5dcdd2a69e7e5c0aad503b4deaea5cedb682130cc699c669128b8fadcc65ba8",
+          "gitBlob": "69932e04c5e818c6b863bf47c2cee33483a367af"
+        },
+        {
+          "path": "references/linked-signal.md",
+          "sha256": "e14567f5ebc1c39416e5abb25bc27290b67a0bece4c13af966e8df4c723a39b4",
+          "gitBlob": "d8b0df78ad5a4a8316916a56994369e7d72eab57"
+        },
+        {
+          "path": "references/loading-strategies.md",
+          "sha256": "4eb2e243425443426d28c6f68c823d501c7b2bf64e4587c96c4c6013d57e7c93",
+          "gitBlob": "f4d269f9089189dc667d9b4640b3321bc80fd7f3"
+        },
+        {
+          "path": "references/mcp.md",
+          "sha256": "2fbb9a897fb0b7f9214486f475a89bc32a2e889e7770a233ba55a7d36ddd1ca5",
+          "gitBlob": "189c9bed2135e9a5bb285a99f38f4e796fc2e463"
+        },
+        {
+          "path": "references/migrations.md",
+          "sha256": "9e6906ae22b59871e4c2381d1a7175214bbe7117c042731a5db46ea214b1b6d0",
+          "gitBlob": "6d904626ffb8a999006064715c548e18cced6918"
+        },
+        {
+          "path": "references/naming-conventions.md",
+          "sha256": "f0751d75d12a76ff0415124948ead5ae1a67d14a84360e64526aa8bac7d6c5d3",
+          "gitBlob": "c0c1fcb84e29427a70666fe2cfa41f2616a29476"
+        },
+        {
+          "path": "references/navigate-to-routes.md",
+          "sha256": "ea3c3d53b5db47b4f8d8b05124330e72bea92fc908d42c06aa7edb9e652b425e",
+          "gitBlob": "3a1eaa0fe5493f8f0dbb7301a74ce47253a2c82d"
+        },
+        {
+          "path": "references/outputs.md",
+          "sha256": "4d6900ff9ab90168969c3d05b67d88f69bb6a46aa4b74a8a8290ba0643c6d8dd",
+          "gitBlob": "66b84e37bca19aae814df98093406e482806ba61"
+        },
+        {
+          "path": "references/pipes.md",
+          "sha256": "76bd0f2f3ac9096ee511427df6ea73cab75f06a3566ab4595ba4f2ec8c0c6fc9",
+          "gitBlob": "a3182a29a45002cedeb50f1128f1c9735bb83f34"
+        },
+        {
+          "path": "references/queries-and-projection.md",
+          "sha256": "3b3de1c3f45be52def1064ba7e06ac23710660440559713678ec3441c0ff6358",
+          "gitBlob": "e2a3461f91840fecd216ba0412e70945f61e60ae"
+        },
+        {
+          "path": "references/reactive-forms.md",
+          "sha256": "edfc57c191d29a1549e9aa9b4ba0d1111a9792caa65918d62967920647717121",
+          "gitBlob": "124da143bd6717b7ad1390b2d3a781ee85146c42"
+        },
+        {
+          "path": "references/rendering-strategies.md",
+          "sha256": "943b809eb8036192b045a1398ac0c9065bca5800e138b3691f74168ac2e2e28c",
+          "gitBlob": "9d8efe7649ad864928ccd603b248bc55b498fa67"
+        },
+        {
+          "path": "references/resource.md",
+          "sha256": "c3cfec3c5da209c4d42206697eb959f23211d84fc631060020e6a7b36f0c7712",
+          "gitBlob": "05d3788be8b41ec4f521aca2871301e8b421cb86"
+        },
+        {
+          "path": "references/route-animations.md",
+          "sha256": "eda1452f85ce05f3f28753cc77cd8c31c7a52515d7ccebbb35de0ec1e3beb374",
+          "gitBlob": "56cebbede2419d26258abfee45245f3c98a12d9b"
+        },
+        {
+          "path": "references/route-guards.md",
+          "sha256": "c33e62647ffbf1790ea2b5a9fd624e50b3745c66aa050f037a8440f835f613c7",
+          "gitBlob": "3195102c7d4112b75a96ad71fc06bd47f68ba0da"
+        },
+        {
+          "path": "references/router-lifecycle.md",
+          "sha256": "4abc8cb8dfeb2e9f57dc11c117d5f4a5b756b39dc076910d9ced9da640effc2d",
+          "gitBlob": "be9aeb6ec79bf1209155d4c8db527692d25788e0"
+        },
+        {
+          "path": "references/router-testing.md",
+          "sha256": "9b0691a3ddd33dc3da1c4b2e6764fefdd6620bd99ce36950eb2bfa1059fe6250",
+          "gitBlob": "ad5f822a487a97c028a8fa8735a4127715b9bb32"
+        },
+        {
+          "path": "references/server-side-rendering.md",
+          "sha256": "5ebae753b3a8625b194bcc94102b12ccd4ec3d517b047b3ee20018dac60a9928",
+          "gitBlob": "4a9fe953731b66ab38c1cef8f169513a49ef1714"
+        },
+        {
+          "path": "references/show-routes-with-outlets.md",
+          "sha256": "43a2ed62ea2edafa8569bf7045f20928110f8f844d5890bfb6a2f2dde45e754b",
+          "gitBlob": "af43f014f1189e0bc14b7fedcaf6a11c925f1609"
+        },
+        {
+          "path": "references/signal-forms.md",
+          "sha256": "47b5803bf2b25f90494dacb243f38ce613756f347a5502f4d210f15425379ae7",
+          "gitBlob": "ac71f1b3330eb076d12d246137e72404fca24f39"
+        },
+        {
+          "path": "references/signals-overview.md",
+          "sha256": "da07c58fdea2ab7d82a28faf9f3d117ccb98ccaf3eec06f103b898f557791146",
+          "gitBlob": "07fb6ed9d7f86f48c7ba9daa1717a444dbad8b8f"
+        },
+        {
+          "path": "references/tailwind-css.md",
+          "sha256": "bdb952d0dd2d415560a796ecaf843cacff5ac20d8ef961eaaf75656fef9b9263",
+          "gitBlob": "9139fcdcaf9fe8f3dbdb6ad9f7a35af190bbafe2"
+        },
+        {
+          "path": "references/template-driven-forms.md",
+          "sha256": "52e83e576b0c6dc05f854e903c4cfda1222bcd55c50ddee07344d1e53d02c1df",
+          "gitBlob": "1907eeb990063b054b3411a8062b59a8ed825646"
+        },
+        {
+          "path": "references/testing-fundamentals.md",
+          "sha256": "ac7964d31d41627ca1ba900433c6e43090d10236b2176bbea7a9311577f7404e",
+          "gitBlob": "5fa7bce97d28606d5ad992852d11bdfd3518d789"
+        }
+      ]
+    },
+    {
+      "id": "ionic-design",
+      "repository": "cap-go/capacitor-skills",
+      "commit": "e90bb5639130e34387f00bf0a95c6d47e4a2ebb8",
+      "directory": "skills/ionic-design",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "5362d3893dedac4c94233e293c3ad13505137d8eab0c803a178794f825f8ed53",
+          "gitBlob": "e7599e92f345eef0bb109d4228641d77efd99260"
+        },
+        {
+          "path": "metadata.json",
+          "sha256": "f2b36d5feff60e6f1ebc03c497a7f074241dc6ddc6014002615990736e29aba9",
+          "gitBlob": "3a3a61d74ca88050e5782c037fa8fa415145d219"
+        },
+        {
+          "path": "references/components.md",
+          "sha256": "9fa83af40d65c5f7223e26495b182c43db0b1ac2eb2c54e23e51daca38628b64",
+          "gitBlob": "4abf093ad0836d743a6e2ebf5d25069b2de7b1ea"
+        },
+        {
+          "path": "references/ionic-9-migration.md",
+          "sha256": "a7401c6719b101033ef9e8ce2e43089cd3bbf42ab872b2ab447d562519976190",
+          "gitBlob": "8981053ef2ab48cb56e2c4e00fd916bf8968eaad"
+        },
+        {
+          "path": "references/theming.md",
+          "sha256": "df6a80c9be4653ea4c0a6c74bf8633f04f176f79b1e1382f343cff5b11ad6d2d",
+          "gitBlob": "223b01d0727666c397affdea0864e2a9646cf611"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "50b224d70e950871b6dcce2d92cde5e509f3c6f01e50e987343589811d7e5c32",
+          "gitBlob": "e929dfafaf1c366ddf05f1f641b35dbda03d42a8"
+        }
+      ]
+    },
+    {
+      "id": "capacitor-best-practices",
+      "repository": "cap-go/capacitor-skills",
+      "commit": "e90bb5639130e34387f00bf0a95c6d47e4a2ebb8",
+      "directory": "skills/capacitor-best-practices",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "3420ca8a1b7b16d1d592a440941671f4c294287b6e8215cda0d972e6088d99a3",
+          "gitBlob": "cae5fb5ecc478ce787f1029a15ab0577dd4da635"
+        },
+        {
+          "path": "metadata.json",
+          "sha256": "b9f91229a0e14048863165c006b5649b0cf09d225861b0e92592f04f26aeb422",
+          "gitBlob": "10e103bf045ef33b1e104dffff3f4c1010208896"
+        },
+        {
+          "path": "references/config-and-project.md",
+          "sha256": "47b656cd3285d0c8e5e178fab92cf7d70f29246d95736ca2dc05567fc8d4e1d3",
+          "gitBlob": "edffb18d3a76e80f97070c7793cfee5bca732467"
+        },
+        {
+          "path": "references/native-projects.md",
+          "sha256": "c4a28b5a232a7d5a8ab28c09b0fb3df3b8f993578389f976b0c11112d3021d7e",
+          "gitBlob": "abe654621de1fef2630a62121f936ae040dd4a8f"
+        },
+        {
+          "path": "references/plugins.md",
+          "sha256": "a378e0b895e4abe4de4a252fb97eae761b49649ccd70d6ecced583ed0b9b16cd",
+          "gitBlob": "44c7b4e2b5b7b051a8665c97ca6d703f06f247b3"
+        },
+        {
+          "path": "references/release-checklist.md",
+          "sha256": "4275deb203c128ad0ffc304de08640b465fdb7839a9fbde5fb273589c49fc2bb",
+          "gitBlob": "8417f156233e1f5ffb1e5e41206e13c83a73a35d"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "50b224d70e950871b6dcce2d92cde5e509f3c6f01e50e987343589811d7e5c32",
+          "gitBlob": "e929dfafaf1c366ddf05f1f641b35dbda03d42a8"
+        }
+      ]
+    },
+    {
+      "id": "supabase-postgres-best-practices",
+      "repository": "supabase/agent-skills",
+      "commit": "c9be0e931b7930f7d02126d04774d904c381e7d7",
+      "directory": "skills/supabase-postgres-best-practices",
+      "files": [
+        {
+          "path": "CHANGELOG.md",
+          "sha256": "751ad110037c85d400018c9894716a04fa46357ff55c22b1169b280752e19e88",
+          "gitBlob": "6d7d0d2acd380d09be9a4431037858149ce3496f"
+        },
+        {
+          "path": "SKILL.md",
+          "sha256": "ad65e776f45e761bafc609d3f506c77c1032225aa65e0c4c02f241b8071e5855",
+          "gitBlob": "6400792389dfcc82c81953054e546bd72ebcd259"
+        },
+        {
+          "path": "references/_contributing.md",
+          "sha256": "191e039e7d94764e6073410b513b559f9a594e0fdf0252a30c2a2986df2ab3bc",
+          "gitBlob": "1c055aff9ad2bf12cfe7edc0002f2f77fe6980d2"
+        },
+        {
+          "path": "references/_sections.md",
+          "sha256": "c9e992612b422c7122de0b7542ebc2450db283edaab08cfe86c6d657fcccccd5",
+          "gitBlob": "8ba57c23e8119e411fcc8a230cda08e695792cac"
+        },
+        {
+          "path": "references/_template.md",
+          "sha256": "6299954250f212caabe339d752c3e5313a8e07d1a182a4e4b425baee91df1bd2",
+          "gitBlob": "91ace90e10a4d8ef354a82bb1994842e6979ebed"
+        },
+        {
+          "path": "references/advanced-full-text-search.md",
+          "sha256": "40c2606bbb4c4dce31308f201b24cc7f58c7df05b1d9c6856fe2b888d3b7cf28",
+          "gitBlob": "582cbeaada9378a280ad61f57e06c10d258e3c43"
+        },
+        {
+          "path": "references/advanced-jsonb-indexing.md",
+          "sha256": "24cacf6a8bc35901dd566d24502ce8e57f810a5c196b897e61d52726e521d106",
+          "gitBlob": "e3d261ea117fd7b1ad9c4f0d45308407b898ed5a"
+        },
+        {
+          "path": "references/conn-idle-timeout.md",
+          "sha256": "630588902c00fcec59a5988cc5d042f76dcf2c923a535abfd8c47dca205eaed5",
+          "gitBlob": "40b9cc50dd12cf347ed189fac965673b533f3f99"
+        },
+        {
+          "path": "references/conn-limits.md",
+          "sha256": "11b2a67a7c7679cbbc5d807bbb17e69c98484a581d0c8b929c03408f412b81b2",
+          "gitBlob": "cb3e400c0234e7e9196c1650423faad66375b70b"
+        },
+        {
+          "path": "references/conn-pooling.md",
+          "sha256": "88cf086bf98ba865d2e9d0579974e1366b14157619d6a93e7da77be91084e4a5",
+          "gitBlob": "e2ebd581d3c85bff0a077e8d9a2cb562d2513d03"
+        },
+        {
+          "path": "references/conn-prepared-statements.md",
+          "sha256": "174e9332fe3dda5c99b2b00159fb1915ae36c00bab3a7882c14e73e4344e946e",
+          "gitBlob": "555547d834e35b5059152dfb2288eca5e9838ea0"
+        },
+        {
+          "path": "references/data-batch-inserts.md",
+          "sha256": "531933b82d6a622d0fae29e0ea80be6fe5d78655adf2804c271ea84a1930de37",
+          "gitBlob": "997947cb17bfed67f29eaa8da2a58de2306cc2c1"
+        },
+        {
+          "path": "references/data-n-plus-one.md",
+          "sha256": "21a44905e5b16a42741892ec34bb1bfef124d049b140a76934a9acd0f46f5fc2",
+          "gitBlob": "2109186ff88b3ba1cc32789f81e2a00d345c6e3f"
+        },
+        {
+          "path": "references/data-pagination.md",
+          "sha256": "73c9fa10a3d439bedea0e11b640bd25bf30dd50f0d9006cf85baf7c3151543fa",
+          "gitBlob": "633d839323612e212a833dd96828cb31fdfb39f8"
+        },
+        {
+          "path": "references/data-upsert.md",
+          "sha256": "2612af83b20a2701dde30ef1f8d7efd26b7e9eef84717226b8f038a2d2150ff7",
+          "gitBlob": "bc95e2305d955679446c70854cb2b56b183aa56d"
+        },
+        {
+          "path": "references/lock-advisory.md",
+          "sha256": "c88d259dbf81c3771438f59a165f7eab8acd09999dd370bdf807521c73f35aab",
+          "gitBlob": "572eaf0dcf518ac925c4cde41beb60b62852b79c"
+        },
+        {
+          "path": "references/lock-deadlock-prevention.md",
+          "sha256": "09aee46f51d7178c8e55fe056cd5a94a64ba2c122fe418e6900cd99f297b2347",
+          "gitBlob": "974da5edec32f79de0fcdc771d4ef759dc3e049d"
+        },
+        {
+          "path": "references/lock-short-transactions.md",
+          "sha256": "5aa7f61095916986d39644b446cdbcd2bacca7ef698a3bb50b3f82dd60207602",
+          "gitBlob": "e6b8ef2633248a4aa4394628e48d8cb693e7e6ab"
+        },
+        {
+          "path": "references/lock-skip-locked.md",
+          "sha256": "6c45077f430f29cd9cd8f448c94d578e827e7bd023fcdaf717a756acb116fa4b",
+          "gitBlob": "77bdbb97045010ce2fdbd90733e8f764be82881a"
+        },
+        {
+          "path": "references/monitor-explain-analyze.md",
+          "sha256": "4cb67ffbf8e57f2e5b380b0beb4242528b513723ce314a2c2ffcf083bd4203d7",
+          "gitBlob": "542978c3bafc510fa8d7a8864cff994ad40be4d7"
+        },
+        {
+          "path": "references/monitor-pg-stat-statements.md",
+          "sha256": "89dca99d4e894fcbdcac136be7ad9fbc03d1342904f065c1b198dc9cf495f098",
+          "gitBlob": "d7e82f1aacd105d53789eb6188d11e8ea39e7310"
+        },
+        {
+          "path": "references/monitor-vacuum-analyze.md",
+          "sha256": "2892272011710eb49b3f185ec12f15ce9ce4c365792c672f6e2a9c90da426a1a",
+          "gitBlob": "e0e8ea0b7db8c1513a0d1605be477192bc21d91d"
+        },
+        {
+          "path": "references/query-composite-indexes.md",
+          "sha256": "73e42424e671f0266e74fdb220db3196790f69fb43e2b19c7b9483eb4971b554",
+          "gitBlob": "fea64523fd5bb3696f943d486ccaf2aea75d27b8"
+        },
+        {
+          "path": "references/query-covering-indexes.md",
+          "sha256": "daf2a7f0477fb7357b62b5fb5b185b1995a77a186347e45cb780e25e7a7589b6",
+          "gitBlob": "9d2a4947b94516dd975e1044d132bb007280f478"
+        },
+        {
+          "path": "references/query-index-types.md",
+          "sha256": "472a74f22c2df203bd0154999b3a5a0187cca2ab3d9a3978e305bb7c32f1a282",
+          "gitBlob": "93b32590f4bfe377869274f45414ae6e43d168fa"
+        },
+        {
+          "path": "references/query-missing-indexes.md",
+          "sha256": "91ad8b0ff4365704b4830a7f077c6f140f7140fd5d3ce5cd0b92b160cf9e25f1",
+          "gitBlob": "e6daace7dd368c75cdf87dc61be4afd6ff66cbbe"
+        },
+        {
+          "path": "references/query-partial-indexes.md",
+          "sha256": "6448982bc8558c6555284958edc331b29239c6a0130e6b4501dd6d4da607a6dd",
+          "gitBlob": "3e61a3417b9cce3c8cee99b39b78b7ebf495dd1f"
+        },
+        {
+          "path": "references/schema-constraints.md",
+          "sha256": "90e8efda3e9e81095e642911ad4aae2809d160f29414338fa997253238f510f8",
+          "gitBlob": "1d2ef8f9a968cd6fa882c7299134c30ace06373c"
+        },
+        {
+          "path": "references/schema-data-types.md",
+          "sha256": "e01b58c14c7f3f65d8ead580b9a4fcf70b83baaab0f9a5f83c569c9fd113e8c8",
+          "gitBlob": "f253a5819d05531371e04485ab84f552fbb32fbe"
+        },
+        {
+          "path": "references/schema-foreign-key-indexes.md",
+          "sha256": "7587713d12a65a212365459b3d39e4717d8a79e4073b10bd62f1054d8192c0dd",
+          "gitBlob": "6c3d6ff622b8a9df358f6673f323292e682ce87c"
+        },
+        {
+          "path": "references/schema-lowercase-identifiers.md",
+          "sha256": "4bc80f70865f2390872591f326c8a6be6456a0aeb5a7e5a2475d7cd9d43059ab",
+          "gitBlob": "f0072940b159ff64e0c2d4fbb499133cb8f49a66"
+        },
+        {
+          "path": "references/schema-partitioning.md",
+          "sha256": "541e13fbeaf4bb1485c9059d4c9417dbdb766cf16f4237cd63a04ada7ec45b90",
+          "gitBlob": "13137a03275fa45001c870a40b0069204d44e005"
+        },
+        {
+          "path": "references/schema-primary-keys.md",
+          "sha256": "3c8beabef82066f9a0838b926da0885117fd2d9a263aaf84cb5ca9e5f0d400e9",
+          "gitBlob": "fb0fbb166fac9ea38c127d807a263282acc2dc93"
+        },
+        {
+          "path": "references/security-privileges.md",
+          "sha256": "095909274a4fb43df785d7144cf674eeb40284d2d45628f14af4108737b93663",
+          "gitBlob": "448ec345fab6c5a0116c584d65638b86d758c558"
+        },
+        {
+          "path": "references/security-rls-basics.md",
+          "sha256": "e04dd1a3a382aafdaaa73fe9f7976352acdde6e90c2a2470d281b94d4f44b096",
+          "gitBlob": "c61e1a8503de113be0981759b82f5e37090f344c"
+        },
+        {
+          "path": "references/security-rls-performance.md",
+          "sha256": "2e1faeca7d5746e246b1c78f9492fe2a9cfa41c4d7fa1e23c402d58fa18ea014",
+          "gitBlob": "c3c7c416d57d9a46a9993f4e0c20f772fb64483d"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "b65e575eb4f04a13c187d64e958321298e2ab84d67aa8428819f362056ba292c",
+          "gitBlob": "d3c9e94fbc6c28f66ecb5a01407d543c99c811b6"
+        }
+      ]
+    },
+    {
+      "id": "playwright-cli",
+      "repository": "microsoft/playwright-cli",
+      "commit": "9166133dd68a4ba30ac959fade685e7c907e8629",
+      "directory": "skills/playwright-cli",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "b07a6cbe4e5b638046fe0b9df0e84783cb9899f0aed3db1eef915601c3260a64",
+          "gitBlob": "aa8dea4bba35a00b362fa925b25b8058b9a28fa6"
+        },
+        {
+          "path": "references/element-attributes.md",
+          "sha256": "bf19aa4671e0a50a0fefa9c790f39124e803060eefe395042b723c29fcb7faa2",
+          "gitBlob": "4e9fa6b99103bbe4e1262c37a9c4a664dfe1dbd5"
+        },
+        {
+          "path": "references/playwright-tests.md",
+          "sha256": "c5b0719fef2cfdff50bd744051b2f9afc119775db4b48e9b2882c1cf3886797c",
+          "gitBlob": "bec2ec90e4adbc6ed56f06ab19c34916ce7f736b"
+        },
+        {
+          "path": "references/pr-attachments.md",
+          "sha256": "24b118e74598be72e73e24fe223d295b9099c85b1860a7c8f6e5690c9038fa2a",
+          "gitBlob": "91663b58bccf34b1cd2790ef8ae335d45b3d99df"
+        },
+        {
+          "path": "references/request-mocking.md",
+          "sha256": "54e801c9663fc2b6d68ceb058cb1c360724c2499f42acc7852a68e83e5b5f37c",
+          "gitBlob": "9005fda67dfc4af13848fd9ebedee08420aeec97"
+        },
+        {
+          "path": "references/running-code.md",
+          "sha256": "eac97e0b77e723f8b1d7b64f276f92efa72f74453f45a805352d27ea1853a495",
+          "gitBlob": "565eefdb584a6e904ceb86701fd789977840a6d4"
+        },
+        {
+          "path": "references/session-management.md",
+          "sha256": "a4f16271f95d3eec7bc56e659d8adbb8f6ad7d603a6fa15efdcdd071a50c6ce3",
+          "gitBlob": "eb1bde35d9ce619d5cd939384d656e5c91310ebd"
+        },
+        {
+          "path": "references/storage-state.md",
+          "sha256": "71e90f774b5a7d61367f2336940f30be7c5693d43197b63d1154634b99ae5045",
+          "gitBlob": "e2390da8da25ce03d559d2a199bc4bb69f880cce"
+        },
+        {
+          "path": "references/test-generation.md",
+          "sha256": "b9c5dda349a469b9abf9f10f3787135e6521f433f5743de399a164e14e76f7ce",
+          "gitBlob": "49c76d2991f9165f77e9b9755dbdd4996ab8e586"
+        },
+        {
+          "path": "references/tracing.md",
+          "sha256": "4e397e16e6bd92d8696cb815c4ee6dc4ce0be1da9e760e261a9c30b44c7857c7",
+          "gitBlob": "88d7eab6216c72645b198482813fe94cbb5b6ec1"
+        },
+        {
+          "path": "references/video-recording.md",
+          "sha256": "1c800b897824cb54394c34265d8ebffdbb530adfc8d612c5d798b667a1799f48",
+          "gitBlob": "f0b528ab1a70f2e8d5a828862a3dd89b8644239b"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "9a7110fc2d2f964038e5dc49128f908f29f47a574c961cba16085914e879cbda",
+          "gitBlob": "cefe596afef12e19a8e5e923f1a04c7da3188760"
+        }
+      ]
+    },
+    {
+      "id": "security-review",
+      "repository": "github/awesome-copilot",
+      "commit": "e45ee935ed0b57992ad7b4e07dbea5cb534786f0",
+      "directory": "skills/security-review",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "sha256": "002392d88637b89e4cbc409a0531834970937f3b57c0b448a17e04b5ca6d356c",
+          "gitBlob": "5281fa2f537eadca9e078a770ae129e81b759179"
+        },
+        {
+          "path": "references/language-patterns.md",
+          "sha256": "ddfbcbb68b9d605789c85a168a274219f0ad86f5fc76b46b5332eb42f0c042b3",
+          "gitBlob": "d6af534a2cb44ce6cd206b81f9b4a6a9e8f2b0c3"
+        },
+        {
+          "path": "references/report-format.md",
+          "sha256": "688ef9f2862303527314eb17a090a72d512b907a685f5d1f122d6ebd5ae66db1",
+          "gitBlob": "55fe571706acb2a92fb7bb974a9ccf45b84ec491"
+        },
+        {
+          "path": "references/secret-patterns.md",
+          "sha256": "38f84f60021490d785f33fc70f2ce784888d2a751781a881372e6862e7e11288",
+          "gitBlob": "06d2423facda1e31fb5bacf9e4eeb3e4a63fc520"
+        },
+        {
+          "path": "references/vuln-categories.md",
+          "sha256": "d06159479bd92b9dcf3a2842e09f7712f1fd297c0bc9792fe20bc3cb69188df5",
+          "gitBlob": "9ae764bc84c9eea0e00ea60b6e9f9aa43ebe0b9c"
+        },
+        {
+          "path": "references/vulnerable-packages.md",
+          "sha256": "8693a6a258bad18a8a1d0925bc1eae9c744071ff37a36b8f1da83adca93608af",
+          "gitBlob": "f49fe3fb107a464cac04c0d154fab5023ab148af"
+        },
+        {
+          "path": "LICENSE",
+          "sha256": "e32449d23085399adc1222f7a17408b730550258e51627c153cb108ca9955823",
+          "gitBlob": "89bc5e962c9944cdb050887062afdaaf89be504a"
+        }
+      ]
+    }
+  ]
+}
