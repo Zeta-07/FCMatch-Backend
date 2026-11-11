@@ -1,12 +1,16 @@
-# FCMatch Backend — Fase 0
+# FCMatch Backend
+
+## Fase 1 — Etapas 1 y 2 aprobadas
+
+El propietario aprobó el [contrato objetivo de identidad](docs/fase-1-identidad.md), sus modelos, la excepción temporal Angular 22.2.4 y la persistencia de Etapa 2 para `users`, `sessions`, `action_tokens` y `login_attempts`; detalle en [su informe](docs/fase-1-etapa-2-verificacion.md). La publicación en `feature/fase-1-identidad` está autorizada; no la integración de PR. En esta base solo `/api/v1/health` está implementado y las operaciones `planned` no existen en runtime. Etapa 3 está autorizada exclusivamente para registro/verificación y se implementará después de publicar esta base; no login ni interfaces.
 
 Informe compartido de verificación y publicación: [docs/fase-0-verificacion.md](docs/fase-0-verificacion.md).
 
-API REST única en Node.js + Express + TypeScript estricto. En esta fase únicamente sirve infraestructura: `GET /api/v1/health` consulta PostgreSQL real. No existen cuentas, autenticación ni operaciones de torneos.
+API REST única en Node.js + Express + TypeScript estricto. Actualmente solo sirve infraestructura: `GET /api/v1/health` consulta PostgreSQL real. Las tablas de identidad no habilitan registro/login ni operaciones de torneos.
 
 ## Requisitos
 
-- Node.js 26.13.0 LTS y npm 12.2.1.
+- Node.js 26.13.0 LTS y npm 12.2.2.
 - PostgreSQL 18.6. El entorno local Windows usa binarios oficiales de EDB, escucha solo en `127.0.0.1:5433` y crea bases independientes de desarrollo y pruebas.
 - En el espacio de trabajo original, `. ../tooling/activate.ps1` activa las herramientas locales sin cambiar Windows globalmente.
 
@@ -31,7 +35,7 @@ npm audit
 npm outdated
 ```
 
-`check` ejecuta tipos, lint, formato, validación OpenAPI, cinco pruebas HTTP/configuración, dos pruebas de integración y compilación. Las pruebas de integración requieren `TEST_DATABASE_URL` distinta de `DATABASE_URL`.
+`check` ejecuta integridad de skills, tipos, lint, formato, validación OpenAPI, pruebas HTTP/configuración/contrato, integración y compilación. En Etapa 2 son 15 pruebas unitarias/configuración/contrato y 18 integraciones (16 de persistencia más PostgreSQL/SMTP de infraestructura). Las pruebas de identidad requieren `TEST_DATABASE_URL` distinta de desarrollo y un nombre terminado en `_test`; no ejecutan fixtures ni Down sobre desarrollo.
 
 El contrato es `docs/openapi.yaml`. `npm run api:generate` genera los tipos en `src/shared/api/`. No se implementan por adelantado endpoints de otras fases.
 

@@ -1,18 +1,35 @@
 openapi: 3.1.0
 info:
   title: FCMatch API
-  version: 0.0.0
-  description: Contrato de infraestructura de la Fase 0. No incluye operaciones de negocio.
+  version: 0.1.0
+  description: |
+    Contrato objetivo de identidad de Fase 1 (RF-01 a RF-06).
+    Etapa 1: solo health está implementado. Las operaciones marcadas planned
+    documentan entregas posteriores y todavía responden 404 en la API ejecutable.
+    Web Cliente y móvil en navegador usan access en memoria y refresh en cookie
+    HttpOnly. Android/iOS y almacenamiento seguro nativo se validarán en Fase 11.
+    Políticas y trazabilidad: docs/fase-1-identidad.md del repositorio Backend.
   license:
     name: Uso privado del proyecto
     identifier: LicenseRef-FCMatch-Private
 servers:
   - url: http://localhost:3000/api/v1
     description: Desarrollo local
+tags:
+  - name: Infraestructura
+    description: Comprobaciones existentes de Fase 0.
+  - name: Identidad
+    description: Registro, correo y sesiones de usuarios finales; no administra la plataforma.
+  - name: Perfiles
+    description: Perfil propio, búsqueda y consulta pública sin datos privados.
+security:
+  - AccessToken: []
 paths:
   /health:
     get:
       operationId: getHealth
+      tags: [Infraestructura]
+      x-implementation-status: implemented
       summary: Verificar API y conectividad PostgreSQL
       security: []
       responses:
@@ -34,8 +51,1005 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiError'
+  /auth/csrf:
+    get:
+      operationId: getBrowserCsrf
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Inicializar protección CSRF del cliente navegador
+      description: |
+        Requiere un Origin de cliente configurado, no un origen arbitrario, o
+        navegación same-origin comprobada cuando el navegador omite Origin.
+        Establece o reutiliza un contexto HttpOnly host-only y devuelve su prueba
+        firmada en JSON para conservarla en memoria. No crea una sesión autenticada.
+        Los contextos y cookies de Web Cliente y móvil navegador son independientes.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/CsrfBootstrapOrigin'
+      responses:
+        '200':
+          description: Contexto CSRF disponible; no almacenar la respuesta en caché.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            Set-Cookie:
+              $ref: '#/components/headers/BrowserCookies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CsrfContext'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/register:
+    post:
+      operationId: registerUser
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Solicitar registro y verificación del correo
+      description: |
+        Respuesta genérica para correo nuevo o existente y para fallos de entrega
+        SMTP posteriores a persistir la solicitud. 202 no garantiza entrega.
+        Username es público: su indisponibilidad puede devolver 409 sin revelar correo.
+        No inicia sesión ni devuelve identificadores de cuenta, contraseñas o tokens.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /auth/verify-email:
+    post:
+      operationId: verifyUserEmail
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Verificar el correo con un token de un solo uso
+      description: |
+        No consume tokens mediante GET ni inicia sesión automáticamente.
+        Token vencido, inválido, de otra finalidad o consumido produce el mismo error.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        $ref: '#/components/requestBodies/ActionToken'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/InvalidActionToken'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/resend-verification:
+    post:
+      operationId: resendEmailVerification
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Solicitar reenvío de verificación sin enumerar cuentas
+      description: Misma aceptación para cuenta inexistente, verificada o entrega SMTP fallida.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        $ref: '#/components/requestBodies/Email'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /auth/login:
+    post:
+      operationId: loginUser
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Iniciar sesión con correo verificado
+      description: |
+        Cuenta inexistente, contraseña incorrecta, correo sin verificar o bloqueo
+        temporal comparten 401 y mensaje genérico. El límite por IP devuelve 429.
+        El refresh se entrega exclusivamente por cookie HttpOnly; nunca en JSON.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/BrowserSession'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/refresh:
+    post:
+      operationId: refreshBrowserSession
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Rotar el refresh de la sesión navegador
+      description: |
+        Sin refresh en cuerpo ni query. La rotación es atómica, no amplía la vida
+        absoluta de la familia y no admite gracia ni replay exitoso. Reutilizar un
+        refresh consumido revoca la familia y devuelve 401. Las renovaciones
+        concurrentes con el mismo token no producen dos sucesores válidos.
+        El cliente coordina una única renovación por sesión, también entre pestañas.
+        Si se pierde la respuesta tras rotar, se requiere iniciar sesión otra vez;
+        no se reenvía automáticamente la solicitud con el token anterior.
+      security:
+        - WebRefreshCookie: []
+          BrowserCsrf: []
+        - MobileBrowserRefreshCookie: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      responses:
+        '200':
+          $ref: '#/components/responses/BrowserSession'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/logout:
+    post:
+      operationId: logoutBrowserSession
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Revocar sesión actual y limpiar sus cookies
+      description: |
+        Idempotente con contexto CSRF válido, incluso sin sesión vigente.
+        Revoca la familia identificable de la cookie del cliente y elimina cookies.
+        No exige access vigente para poder cerrar una sesión con access vencido.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      responses:
+        '204':
+          description: Sesión cerrada o ya ausente; cookies del cliente eliminadas.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+            Set-Cookie:
+              $ref: '#/components/headers/BrowserCookies'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/logout-all:
+    post:
+      operationId: logoutAllUserSessions
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Revocar todas las sesiones de la cuenta
+      description: Incluye la sesión actual; revocación comprobada también al usar access tokens.
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      responses:
+        '204':
+          $ref: '#/components/responses/SessionsRevoked'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/forgot-password:
+    post:
+      operationId: requestPasswordReset
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Solicitar recuperación sin revelar si existe la cuenta
+      description: Misma aceptación ante entrega SMTP fallida; el correo contiene el único token utilizable.
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        $ref: '#/components/requestBodies/Email'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /auth/reset-password:
+    post:
+      operationId: resetUserPassword
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Restablecer contraseña y revocar sesiones
+      security:
+        - BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/SessionsRevoked'
+        '400':
+          $ref: '#/components/responses/InvalidActionToken'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /auth/change-password:
+    post:
+      operationId: changeUserPassword
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Cambiar contraseña acreditando la actual y revocar sesiones
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+      responses:
+        '204':
+          $ref: '#/components/responses/SessionsRevoked'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /users/me:
+    get:
+      operationId: getMyProfile
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Consultar datos de la propia cuenta verificada
+      responses:
+        '200':
+          $ref: '#/components/responses/OwnProfile'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+    patch:
+      operationId: updateMyProfile
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Editar exclusivamente username y liga
+      description: No admite email, publicId, rol, verificación, estadísticas o claves de almacenamiento.
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/OwnProfile'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /users/me/email-change:
+    post:
+      operationId: requestMyEmailChange
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Solicitar verificación de un nuevo correo
+      description: |
+        Requiere contraseña actual. Conserva el correo anterior hasta confirmar.
+        La aceptación no revela si el correo solicitado pertenece a otra cuenta.
+        Un fallo SMTP conserva la misma aceptación genérica, sin cambiar el correo
+        ni invalidar sesiones; tampoco revela la disponibilidad del destino.
+        Un timeout de entrega es ambiguo y no equivale a correo recibido.
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmailChangeRequest'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /users/me/email-change/confirm:
+    post:
+      operationId: confirmMyEmailChange
+      tags: [Identidad]
+      x-implementation-status: planned
+      summary: Confirmar el nuevo correo de la cuenta autenticada
+      description: |
+        Verifica que el token pertenece al usuario, consume una sola vez y aplica
+        unicidad en la misma transacción. Si el destino ya no está disponible,
+        responde ACTION_TOKEN_INVALID sin identificar otra cuenta.
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        $ref: '#/components/requestBodies/ActionToken'
+      responses:
+        '200':
+          $ref: '#/components/responses/OwnProfile'
+        '400':
+          $ref: '#/components/responses/InvalidActionToken'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /users/me/avatar:
+    put:
+      operationId: replaceMyAvatar
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Subir o sustituir la foto propia en R2
+      description: |
+        Un archivo JPG/JPEG, PNG o WebP de máximo 5242880 bytes (5 MiB).
+        Validación real de contenido y decodificación en backend, no solo MIME o
+        extensión declarados. Fallar no elimina el avatar anterior. No acepta URLs
+        remotas ni claves de objetos proporcionadas por el cliente.
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  x-max-file-size-bytes: 5242880
+            encoding:
+              file:
+                contentType: image/jpeg, image/png, image/webp
+      responses:
+        '200':
+          description: Avatar persistido; URL firmada de lectura temporal.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Avatar'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '413':
+          $ref: '#/components/responses/PayloadTooLarge'
+        '415':
+          $ref: '#/components/responses/UnsupportedMedia'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+    delete:
+      operationId: deleteMyAvatar
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Eliminar la foto propia de forma idempotente
+      security:
+        - AccessToken: []
+          BrowserCsrf: []
+      parameters:
+        - $ref: '#/components/parameters/BrowserOrigin'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /users:
+    get:
+      operationId: searchUsers
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Buscar perfiles por username desde una sesión verificada
+      parameters:
+        - name: search
+          in: query
+          required: true
+          description: Prefijo de username, insensible a mayúsculas; no busca por correo.
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 30
+            pattern: '^[A-Za-z0-9_]+$'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 20
+        - name: cursor
+          in: query
+          description: Cursor opaco devuelto por la página anterior para la misma búsqueda.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 512
+      responses:
+        '200':
+          description: Página de perfiles públicos; sin datos de autenticación.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersPage'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+  /users/{publicId}:
+    get:
+      operationId: getPublicProfile
+      tags: [Perfiles]
+      x-implementation-status: planned
+      summary: Consultar un perfil público sin iniciar sesión
+      security: []
+      parameters:
+        - name: publicId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Perfil público; correo y datos de sesión excluidos.
+          headers:
+            Cache-Control:
+              $ref: '#/components/headers/NoStore'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicProfile'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/InvalidInput'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
 components:
+  securitySchemes:
+    AccessToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access en memoria; comprobar firma, issuer, audience, expiración y sesión no revocada.
+    BrowserCsrf:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+      description: Prueba CSRF obtenida de getBrowserCsrf y vinculada al contexto HttpOnly del cliente.
+    WebRefreshCookie:
+      type: apiKey
+      in: cookie
+      name: fcmatch_refresh_web
+      description: HttpOnly, host-only, SameSite=Strict, Path=/api/v1/auth; Secure obligatorio fuera de loopback local.
+    MobileBrowserRefreshCookie:
+      type: apiKey
+      in: cookie
+      name: fcmatch_refresh_mobile
+      description: Misma protección, contexto independiente; no representa almacenamiento nativo.
+  parameters:
+    CsrfBootstrapOrigin:
+      name: Origin
+      in: header
+      required: false
+      description: |
+        Origen navegador configurado. Solo en este GET se permite ausencia cuando
+        Sec-Fetch-Site es same-origin y el origen público de API está configurado
+        como cliente permitido; no inferirlo de un Host arbitrario o proxy no confiable.
+      schema:
+        type: string
+        format: uri
+    BrowserOrigin:
+      name: Origin
+      in: header
+      required: true
+      description: Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+      schema:
+        type: string
+        format: uri
+  headers:
+    NoStore:
+      description: No conservar datos de identidad o URLs firmadas en cachés.
+      schema:
+        type: string
+        const: no-store
+    BrowserCookies:
+      description: |
+        Una cabecera Set-Cookie por cookie, sin combinarlas mediante comas. Refresh
+        y contexto CSRF HttpOnly, host-only, SameSite=Strict y Secure en despliegue.
+        Nombres separados por cliente; eliminar con los mismos atributos y Max-Age=0.
+        Excepción Secure solo para desarrollo explícito en loopback HTTP.
+      schema:
+        type: string
+    RetryAfter:
+      description: Segundos mínimos antes de otro intento.
+      schema:
+        type: integer
+        minimum: 1
+  requestBodies:
+    Email:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/EmailRequest'
+    ActionToken:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ActionTokenRequest'
+  responses:
+    Accepted:
+      description: Solicitud aceptada para procesamiento; no confirma existencia de cuenta ni entrega SMTP.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AcceptedRequest'
+    NoContent:
+      description: Operación completada sin cuerpo.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+    SessionsRevoked:
+      description: Operación completada; sesiones revocadas, cookies actuales eliminadas, requiere nuevo login.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+        Set-Cookie:
+          $ref: '#/components/headers/BrowserCookies'
+    BrowserSession:
+      description: Access temporal en JSON; refresh únicamente en cookie HttpOnly.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+        Set-Cookie:
+          $ref: '#/components/headers/BrowserCookies'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BrowserSession'
+    OwnProfile:
+      description: Perfil y datos privados visibles exclusivamente para su titular.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/OwnProfile'
+    InvalidActionToken:
+      description: ACTION_TOKEN_INVALID; token no utilizable, sin distinguir causa ni revelar cuentas.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    InvalidInput:
+      description: VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unauthenticated:
+      description: UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Forbidden:
+      description: ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Conflict:
+      description: USERNAME_UNAVAILABLE; no devuelve ni permite consultar conflictos por correo.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    NotFound:
+      description: NOT_FOUND; perfil no encontrado.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    TooManyRequests:
+      description: RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    PayloadTooLarge:
+      description: PAYLOAD_TOO_LARGE; archivo o petición demasiado grandes.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    UnsupportedMedia:
+      description: UNSUPPORTED_MEDIA_TYPE; formato de imagen no admitido.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+    Unavailable:
+      description: SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+      headers:
+        Cache-Control:
+          $ref: '#/components/headers/NoStore'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
   schemas:
+    Email:
+      type: string
+      format: email
+      maxLength: 254
+      description: Trim y minúsculas; sin eliminar puntos ni etiquetas + del proveedor.
+    Username:
+      type: string
+      minLength: 3
+      maxLength: 30
+      pattern: '^[A-Za-z0-9_]+$'
+      description: Unicidad insensible a mayúsculas; se conserva la presentación elegida.
+    NewPassword:
+      type: string
+      format: password
+      writeOnly: true
+      minLength: 12
+      maxLength: 128
+      description: Sin truncamiento, trim ni normalización; admite frases y Unicode, sin reglas de composición.
+    CurrentPassword:
+      type: string
+      format: password
+      writeOnly: true
+      minLength: 1
+      maxLength: 128
+      description: Entrada de autenticación; no aplicar retroactivamente nuevas reglas de alta.
+    ActionToken:
+      type: string
+      writeOnly: true
+      minLength: 43
+      maxLength: 256
+      pattern: '^[A-Za-z0-9_-]+$'
+      description: Secreto opaco de al menos 256 bits; nunca aparece en respuestas JSON.
+    EmailRequest:
+      type: object
+      additionalProperties: false
+      required: [email]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+    RegisterRequest:
+      type: object
+      additionalProperties: false
+      required: [email, username, password]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        username:
+          $ref: '#/components/schemas/Username'
+        password:
+          $ref: '#/components/schemas/NewPassword'
+    LoginRequest:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          $ref: '#/components/schemas/CurrentPassword'
+    ActionTokenRequest:
+      type: object
+      additionalProperties: false
+      required: [token]
+      properties:
+        token:
+          $ref: '#/components/schemas/ActionToken'
+    ResetPasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [token, newPassword]
+      properties:
+        token:
+          $ref: '#/components/schemas/ActionToken'
+        newPassword:
+          $ref: '#/components/schemas/NewPassword'
+    ChangePasswordRequest:
+      type: object
+      additionalProperties: false
+      required: [currentPassword, newPassword]
+      properties:
+        currentPassword:
+          $ref: '#/components/schemas/CurrentPassword'
+        newPassword:
+          $ref: '#/components/schemas/NewPassword'
+    EmailChangeRequest:
+      type: object
+      additionalProperties: false
+      required: [newEmail, currentPassword]
+      properties:
+        newEmail:
+          $ref: '#/components/schemas/Email'
+        currentPassword:
+          $ref: '#/components/schemas/CurrentPassword'
+    UpdateProfileRequest:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        username:
+          $ref: '#/components/schemas/Username'
+        leagueName:
+          type: [string, 'null']
+          maxLength: 100
+          description: Texto simple; null elimina la liga. Rechazar cadena vacía tras trim.
+    AcceptedRequest:
+      type: object
+      additionalProperties: false
+      required: [message]
+      properties:
+        message:
+          type: string
+          const: Si la solicitud es válida, recibirás instrucciones. Si no llegan, podrás solicitar un nuevo envío.
+    CsrfContext:
+      type: object
+      additionalProperties: false
+      required: [csrfToken, csrfExpiresAt]
+      properties:
+        csrfToken:
+          type: string
+          minLength: 43
+          maxLength: 256
+        csrfExpiresAt:
+          type: string
+          format: date-time
+    BrowserSession:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          accessToken,
+          tokenType,
+          expiresIn,
+          sessionExpiresAt,
+          csrfToken,
+          csrfExpiresAt,
+        ]
+      properties:
+        accessToken:
+          type: string
+          description: JWT; conservar solo en memoria, nunca en logs o almacenamiento persistente.
+        tokenType:
+          type: string
+          const: Bearer
+        expiresIn:
+          type: integer
+          minimum: 1
+          maximum: 900
+          description: Vida máxima del access en segundos, sin superar el vencimiento de la sesión.
+        sessionExpiresAt:
+          type: string
+          format: date-time
+          description: Límite absoluto de la familia, máximo 30 días desde login.
+        csrfToken:
+          type: string
+          minLength: 43
+          maxLength: 256
+        csrfExpiresAt:
+          type: string
+          format: date-time
+    Avatar:
+      type: object
+      additionalProperties: false
+      required: [url, expiresAt]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL HTTPS firmada de R2, lectura de avatar público, máximo 5 minutos.
+        expiresAt:
+          type: string
+          format: date-time
+    PublicProfile:
+      type: object
+      additionalProperties: false
+      required: [publicId, username, leagueName, avatar, statistics, history]
+      properties:
+        publicId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: Generado por backend, único, estable y no editable.
+        username:
+          $ref: '#/components/schemas/Username'
+        leagueName:
+          type: [string, 'null']
+          maxLength: 100
+        avatar:
+          anyOf:
+            - $ref: '#/components/schemas/Avatar'
+            - type: 'null'
+        statistics:
+          type: 'null'
+          description: Estado vacío de Fase 1; cálculo diferido a Fase 8, sin métricas inventadas.
+          x-deferred-phase: 8
+        history:
+          type: array
+          maxItems: 0
+          items:
+            type: object
+          description: Vacío en Fase 1; historial competitivo diferido a Fase 8.
+          x-deferred-phase: 8
+    OwnProfile:
+      type: object
+      additionalProperties: false
+      required: [profile, email, emailVerifiedAt]
+      properties:
+        profile:
+          $ref: '#/components/schemas/PublicProfile'
+        email:
+          $ref: '#/components/schemas/Email'
+        emailVerifiedAt:
+          type: string
+          format: date-time
+    UsersPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/PublicProfile'
+        nextCursor:
+          type: [string, 'null']
+          maxLength: 512
     Health:
       type: object
       required: [status, service, database]
