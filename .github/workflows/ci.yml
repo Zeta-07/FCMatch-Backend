@@ -26,7 +26,7 @@ jobs:
           node-version: '26.13.0'
           cache: npm
       - run: npm install --global npm@12.2.2
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       - name: Preparar bases aisladas y entorno efímero
         run: node scripts/prepare-ci.mjs
         env:

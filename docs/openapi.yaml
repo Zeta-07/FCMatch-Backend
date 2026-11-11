@@ -55,7 +55,7 @@ paths:
     get:
       operationId: getBrowserCsrf
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Inicializar protección CSRF del cliente navegador
       description: |
         Requiere un Origin de cliente configurado, no un origen arbitrario, o
@@ -86,7 +86,7 @@ paths:
     post:
       operationId: registerUser
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Solicitar registro y verificación del correo
       description: |
         Respuesta genérica para correo nuevo o existente y para fallos de entrega
@@ -120,7 +120,7 @@ paths:
     post:
       operationId: verifyUserEmail
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Verificar el correo con un token de un solo uso
       description: |
         No consume tokens mediante GET ni inicia sesión automáticamente.
@@ -146,7 +146,7 @@ paths:
     post:
       operationId: resendEmailVerification
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Solicitar reenvío de verificación sin enumerar cuentas
       description: Misma aceptación para cuenta inexistente, verificada o entrega SMTP fallida.
       security:

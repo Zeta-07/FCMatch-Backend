@@ -1,12 +1,12 @@
 # FCMatch Backend
 
-## Fase 1 — Etapas 1 y 2 aprobadas
+## Fase 1 — Etapa 3: registro y verificación
 
-El propietario aprobó el [contrato objetivo de identidad](docs/fase-1-identidad.md), sus modelos, la excepción temporal Angular 22.2.4 y la persistencia de Etapa 2 para `users`, `sessions`, `action_tokens` y `login_attempts`; detalle en [su informe](docs/fase-1-etapa-2-verificacion.md). La publicación en `feature/fase-1-identidad` está autorizada; no la integración de PR. En esta base solo `/api/v1/health` está implementado y las operaciones `planned` no existen en runtime. Etapa 3 está autorizada exclusivamente para registro/verificación y se implementará después de publicar esta base; no login ni interfaces.
+Las Etapas 1–2 aprobadas están publicadas en `feature/fase-1-identidad`, con PR #5 abierto hacia develop en los tres repositorios. Etapa 3 incorpora registro Argon2id, verificación explícita/reenvío de correo y CSRF del contrato, con PostgreSQL y SMTP local reales; [informe y límites](docs/fase-1-etapa-3-verificacion.md). No implementa login, JWT, sesiones autenticadas ni interfaces. Su publicación está autorizada si las verificaciones pasan; ninguna fusión ni Etapa 4 están autorizadas.
 
 Informe compartido de verificación y publicación: [docs/fase-0-verificacion.md](docs/fase-0-verificacion.md).
 
-API REST única en Node.js + Express + TypeScript estricto. Actualmente solo sirve infraestructura: `GET /api/v1/health` consulta PostgreSQL real. Las tablas de identidad no habilitan registro/login ni operaciones de torneos.
+API REST única en Node.js + Express + TypeScript estricto. Health y cuatro operaciones de registro/verificación están implementadas; las otras quince operaciones de identidad del contrato siguen `planned` y responden 404. Sin operaciones de torneos.
 
 ## Requisitos
 
@@ -19,13 +19,15 @@ API REST única en Node.js + Express + TypeScript estricto. Actualmente solo sir
 Desde este repositorio:
 
 ```powershell
-npm ci
+npm ci --ignore-scripts
 ./scripts/postgres-local.ps1
 npm run db:migrate
 npm run dev
 ```
 
 Para un clon independiente configura `PG_BIN` con el directorio `bin` de PostgreSQL, o prepara una instancia y copia `.env.example` a `.env` con sus credenciales. El script local genera contraseñas aleatorias y no sobrescribe un `.env` existente. No requiere privilegios de administrador. Para detener su instancia: `./scripts/postgres-local.ps1 -Action stop`.
+
+Antes de arrancar, completa también `IDENTITY_*` según `.env.example`: dos secretos aleatorios independientes de al menos 32 bytes en hexadecimal y los orígenes exactos web/móvil/API. Genera y guarda esos secretos directamente en el entorno local ignorado, nunca en Git ni logs. Los dos orígenes cliente deben figurar en `CORS_ORIGINS`. Sin configuración válida el servidor falla de forma segura; no incluye secretos por defecto. El bootstrap CSRF es obligatorio antes de las mutaciones. El enlace del correo apunta a la futura pantalla, todavía no implementada; esta etapa se verifica por API/SMTP local.
 
 ## Verificaciones
 
@@ -35,7 +37,7 @@ npm audit
 npm outdated
 ```
 
-`check` ejecuta integridad de skills, tipos, lint, formato, validación OpenAPI, pruebas HTTP/configuración/contrato, integración y compilación. En Etapa 2 son 15 pruebas unitarias/configuración/contrato y 18 integraciones (16 de persistencia más PostgreSQL/SMTP de infraestructura). Las pruebas de identidad requieren `TEST_DATABASE_URL` distinta de desarrollo y un nombre terminado en `_test`; no ejecutan fixtures ni Down sobre desarrollo.
+`check` ejecuta integridad de skills, tipos, lint, formato, validación OpenAPI, **27 pruebas unitarias/HTTP/configuración/contrato, 31 integraciones reales** y compilación. Incluye registro, CSRF, hashing y entrega/errores SMTP, además de regresiones anteriores. Las pruebas requieren `TEST_DATABASE_URL` distinta de desarrollo y un nombre terminado en `_test`; no ejecutan fixtures ni Down sobre desarrollo.
 
 El contrato es `docs/openapi.yaml`. `npm run api:generate` genera los tipos en `src/shared/api/`. No se implementan por adelantado endpoints de otras fases.
 
@@ -62,7 +64,7 @@ Configura `ENGRAM_BIN` si el ejecutable no está en la ubicación local del espa
 
 ## Estructura y CI
 
-`src/shared/` contiene configuración, conexiones, errores y middleware. `src/modules/` y `src/jobs/` documentan los límites para futuras fases. No existe un segundo backend. Los futuros módulos siguen controlador → servicio → repositorio y solo se relacionan mediante servicios.
+`src/shared/` contiene configuración, conexiones, errores y middleware. `src/modules/users/` implementa registro/verificación por capas controlador → servicio → repositorio; los demás módulos y jobs siguen pendientes. No existe un segundo backend. Los módulos solo se relacionan mediante servicios.
 
 El workflow `.github/workflows/ci.yml` levanta PostgreSQL efímero y ejecuta los controles. No necesita SMTP ni R2 externos. Está preparado, pero su ejecución remota requiere publicar con autorización del propietario.
 

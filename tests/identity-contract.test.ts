@@ -147,6 +147,23 @@ test('contrato identidad: limita las operaciones a RF-01 a RF-06 y health', () =
     operation('/health', 'get')['x-implementation-status'],
     'implemented',
   );
+  for (const [path, methods] of Object.entries(contract.paths)) {
+    for (const [method, item] of Object.entries(methods)) {
+      const implemented =
+        path === '/health' ||
+        path === '/auth/csrf' ||
+        [
+          '/auth/register',
+          '/auth/verify-email',
+          '/auth/resend-verification',
+        ].includes(path);
+      assert.equal(
+        item['x-implementation-status'],
+        implemented ? 'implemented' : 'planned',
+        `${method} ${path}`,
+      );
+    }
+  }
 });
 
 test('contrato identidad: separa perfiles públicos, datos propios y secretos', () => {
