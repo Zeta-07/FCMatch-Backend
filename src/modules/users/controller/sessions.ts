@@ -37,7 +37,7 @@ export function sessionsController(
   function clear(req: Request, res: Response) {
     const context = csrf.context(req);
     res.clearCookie(context.refreshName, attributes);
-    res.clearCookie(context.name, attributes);
+    res.clearCookie(context.name, { ...attributes, path: '/api/v1' });
   }
   function reply(
     req: Request,

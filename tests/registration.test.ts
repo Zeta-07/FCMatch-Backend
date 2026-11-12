@@ -198,11 +198,11 @@ test('CSRF: contexto reutilizable, aislamiento de clientes, firma, expiración y
     .get('/csrf')
     .set('Origin', config.webOrigin)
     .expect(200);
-  const cookie = (first.headers['set-cookie'] as unknown as string[])[0]!.split(
-    ';',
-  )[0]!;
+  const cookie = (first.headers['set-cookie'] as unknown as string[])
+    .at(-1)!
+    .split(';')[0]!;
   assert.match(
-    (first.headers['set-cookie'] as unknown as string[])[0]!,
+    (first.headers['set-cookie'] as unknown as string[]).at(-1)!,
     /HttpOnly; SameSite=Strict/,
   );
   const second = await request(app)
@@ -280,9 +280,9 @@ test('registro HTTP: Origin/CSRF/DTO/tamaño/MIME antes de efectos y sin login',
     .get('/api/v1/auth/csrf')
     .set('Origin', config.webOrigin)
     .expect(200);
-  const cookie = (proof.headers['set-cookie'] as unknown as string[])[0]!.split(
-    ';',
-  )[0]!;
+  const cookie = (proof.headers['set-cookie'] as unknown as string[])
+    .at(-1)!
+    .split(';')[0]!;
   const post = () =>
     request(app)
       .post('/api/v1/auth/register')
@@ -351,7 +351,7 @@ test('CSRF: cookie Secure en HTTPS y rechazo de Host arbitrario en bootstrap sin
     .set('Origin', config.webOrigin)
     .expect(200);
   assert.match(
-    (response.headers['set-cookie'] as unknown as string[])[0]!,
+    (response.headers['set-cookie'] as unknown as string[]).at(-1)!,
     /Secure/,
   );
   await request(app)

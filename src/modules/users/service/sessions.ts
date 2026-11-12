@@ -201,14 +201,35 @@ export class SessionsService {
     return this.grant(root, next, context);
   }
   async authenticate(access: string, context: BrowserContext) {
+    return this.authorized(access, context, async (_client, user, root) => ({
+      user,
+      root,
+    }));
+  }
+  async authorized<T>(
+    access: string,
+    context: BrowserContext,
+    work: (
+      client: PoolClient,
+      user: import('../repository/sessions.js').Credentials,
+      root: SessionRow,
+    ) => Promise<T>,
+    readOnly = false,
+  ) {
     const claims = await this.tokens.verify(access, context);
     return this.tx(async (client) => {
       const user = await this.repo.lockedUser(client, claims.userId);
       const root = await this.repo.session(client, claims.family);
       if (!user?.email_verified_at || !this.alive(root, claims.userId))
         throw unauthenticated();
-      this.match(root, context);
-      return { user, root };
+      if (readOnly) {
+        if (
+          root.client_origin !== context.origin ||
+          root.client_context !== context.client
+        )
+          throw unauthenticated();
+      } else this.match(root, context);
+      return work(client, user, root);
     });
   }
   async logout(refresh: string, context: BrowserContext) {
@@ -272,6 +293,24 @@ export class SessionsService {
     newPassword: string,
     context: BrowserContext,
   ) {
+    const snapshot = await this.verifyCurrentPassword(
+      access,
+      currentPassword,
+      context,
+    );
+    const hash = await this.passwords.hash(newPassword);
+    await this.authorized(access, context, async (client, user) => {
+      if (user.password_hash !== snapshot.user.password_hash)
+        throw unauthenticated();
+      await this.repo.changePassword(client, user.id, hash);
+      await this.repo.revokeAll(client, user.id);
+    });
+  }
+  async verifyCurrentPassword(
+    access: string,
+    currentPassword: string,
+    context: BrowserContext,
+  ) {
     const snapshot = await this.authenticate(access, context);
     const correct = await this.passwords.verify(
       snapshot.user.password_hash,
@@ -298,19 +337,6 @@ export class SessionsService {
       return correct;
     });
     if (!permitted) throw unauthenticated();
-    const hash = await this.passwords.hash(newPassword);
-    await this.tx(async (client) => {
-      const user = await this.repo.lockedUser(client, snapshot.user.id);
-      const root = await this.repo.session(client, snapshot.root.id);
-      if (
-        !user ||
-        user.password_hash !== snapshot.user.password_hash ||
-        !this.alive(root, user.id)
-      )
-        throw unauthenticated();
-      this.match(root, context);
-      await this.repo.changePassword(client, user.id, hash);
-      await this.repo.revokeAll(client, user.id);
-    });
+    return snapshot;
   }
 }

@@ -115,9 +115,9 @@ async function fixture(
     .get('/api/v1/auth/csrf')
     .set('Origin', config.webOrigin)
     .expect(200);
-  const cookie = (csrf.headers['set-cookie'] as unknown as string[])[0]!.split(
-    ';',
-  )[0]!;
+  const cookie = (csrf.headers['set-cookie'] as unknown as string[])
+    .at(-1)!
+    .split(';')[0]!;
   const emails: string[] = [];
   const data = () => {
     const seed = randomUUID().replaceAll('-', '');

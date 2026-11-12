@@ -49,12 +49,13 @@ export function createBrowserCsrf(
   }
   function valid(value: string, origin: string) {
     if (
-      !/^\d{13}\.[A-Za-z0-9_-]{43}\.(-|[a-f0-9-]{36})\.[A-Za-z0-9_-]{43}$/.test(
+      !/^\d{13}\.[A-Za-z0-9_-]{43}\.(-|[a-f0-9-]{36})\.v2\.[A-Za-z0-9_-]{43}$/.test(
         value,
       )
     )
       return false;
-    const [expires, nonce, binding, signature] = value.split('.') as [
+    const [expires, nonce, binding, version, signature] = value.split('.') as [
+      string,
       string,
       string,
       string,
@@ -63,7 +64,10 @@ export function createBrowserCsrf(
     return (
       Number(expires) > now() &&
       Number(expires) <= now() + 3_600_000 &&
-      equal(signature, mac('context', origin, `${expires}.${nonce}.${binding}`))
+      equal(
+        signature,
+        mac('context', origin, `${expires}.${nonce}.${binding}.${version}`),
+      )
     );
   }
   function issue(req: Request, res: Response, binding = '', renew = false) {
@@ -74,13 +78,20 @@ export function createBrowserCsrf(
       !valid(cookie, origin) ||
       cookie.split('.')[2] !== (binding || '-')
     ) {
-      const payload = `${now() + 3_600_000}.${randomBytes(32).toString('base64url')}.${binding || '-'}`;
+      // v2 migra el antiguo Path /auth sin cambiar la raíz de sesión.
+      res.clearCookie(name, {
+        httpOnly: true,
+        secure: config.secureCookies,
+        sameSite: 'strict',
+        path: '/api/v1/auth',
+      });
+      const payload = `${now() + 3_600_000}.${randomBytes(32).toString('base64url')}.${binding || '-'}.v2`;
       cookie = `${payload}.${mac('context', origin, payload)}`;
       res.cookie(name, cookie, {
         httpOnly: true,
         secure: config.secureCookies,
         sameSite: 'strict',
-        path: '/api/v1/auth',
+        path: '/api/v1',
         maxAge: 3_600_000,
       });
     }

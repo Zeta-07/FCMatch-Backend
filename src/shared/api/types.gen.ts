@@ -95,7 +95,7 @@ export type BrowserSession = {
 
 export type Avatar = {
     /**
-     * URL HTTPS firmada de R2, lectura de avatar público, máximo 5 minutos.
+     * URL S3 firmada para lectura del avatar público, máximo 5 minutos. HTTPS en R2 previsto para producción; HTTP solo en 127.0.0.1 para S3 local de desarrollo/pruebas. Integración real R2 pendiente.
      */
     url: string;
     expiresAt: string;

@@ -2,14 +2,14 @@
 
 ## Estado y autorización
 
-El propietario aprobó el 11/11/2026 implementar RF-01 a RF-06 por etapas. **Etapas 1–3 aprobadas/publicadas; Etapa 4 autorizada: autenticación y sesiones exclusivamente.** Health, registro/verificación/CSRF y siete operaciones de sesiones/contraseña son doce implementadas. Las ocho operaciones `planned` de perfiles/avatares/cambio de correo todavía responden 404. Evidencia en `docs/fase-1-etapa-4-verificacion.md`. Un tipo generado por sí solo no acredita un flujo implementado.
+El propietario aprobó las Etapas 1–4 y autorizó exclusivamente Etapa 5: perfiles, búsqueda, cambio de correo y avatares. Las ocho operaciones restantes se incorporan en esta etapa; su validación completa se registra en `docs/fase-1-etapa-5-verificacion.md`. No hay interfaces de Etapa 6. Un tipo generado o un status del contrato no acredita por sí solo un flujo verificado.
 
-Se permiten cambios locales y ramas desde `develop` sincronizado con `main`. El propietario aprobó Etapas 1–3 y autoriza Etapa 4 y su publicación si las verificaciones pasan, actualizando PR #5 sin fusiones. Etapa 5 requiere nueva aprobación. Se conservan tablas/migraciones aplicadas y excepción Angular 22.2.4; incidencias de Etapa 1 son históricas. Ver DT-010/011/013 e informes por etapa.
+Se permiten cambios y publicación en `feature/fase-1-identidad` únicamente tras verificaciones satisfactorias de Etapa 5, actualizando PR #5 existentes sin fusiones ni force push. Etapa 6 requiere nueva aprobación. Se conservan migraciones aplicadas y excepciones de Angular/TypeScript; incidencias de Etapa 1 son históricas.
 
 Decisiones expresas:
 
 - SMTP local real para desarrollo y pruebas; entrega a buzones externos pendiente.
-- Avatares en R2 de desarrollo real, no simulados. Configuración externa pendiente, no bloquea definir el contrato.
+- El propietario sustituyó R2 de desarrollo por S3 local real, sin tarjeta ni activación Cloudflare. SeaweedFS 4.53 es el servicio elegido. R2 sigue previsto para producción, **integración real pendiente**; no es un bloqueo para esta etapa ni se afirma haberla probado.
 - Web Cliente y móvil en navegador como aceptación funcional. Android/iOS y almacenamiento seguro nativo pendientes de Fase 11; no crear plataformas, ejecutar `cap sync` ni afirmar pruebas nativas realizadas.
 - AdminWeb no adelanta funciones de Fase 10. Solo recibe mantenimiento compatible y modelos del contrato compartido, sin pantallas, rutas o permisos nuevos.
 - Sin eliminación de cuenta (Fase 9), amigos, notificaciones o competición. Estadísticas `null` e historial `[]` son estados vacíos, no cálculos ni datos ficticios.
@@ -24,7 +24,7 @@ Todos los paths siguientes llevan `/api/v1`. La API única sigue en Backend. Con
 | ---------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------- |
 | RF-01            | `POST /auth/register`, `/auth/login`                                                                    | Registro, acceso                         | Persistencia real, errores genéricos, correo verificado                                 |
 | RF-02            | `POST /auth/verify-email`, `/auth/resend-verification`, `/auth/forgot-password`, `/auth/reset-password` | Verificación, reenvío, recuperación      | SMTP local recibido, token válido una vez, expiración y concurrencia                    |
-| RF-03            | `GET/PATCH /users/me`, `PUT/DELETE /users/me/avatar`                                                    | Perfil y edición                         | Unicidad en BD, no asignación masiva, R2 real y rechazo de archivos inválidos           |
+| RF-03            | `GET/PATCH /users/me`, `PUT/DELETE /users/me/avatar`                                                    | Perfil y edición                         | Unicidad en BD, no asignación masiva, S3 local real y rechazo de archivos inválidos     |
 | RF-04            | `GET /users?search=`, `GET /users/{publicId}`                                                           | Búsqueda, perfil público                 | Paginación, sin correo ni datos de sesión                                               |
 | RF-05            | `POST /users/me/email-change`, `/users/me/email-change/confirm`                                         | Cambio y confirmación de correo          | Contraseña actual, token del titular, correo anterior hasta confirmar, unicidad atómica |
 | RF-06            | `POST /auth/logout`, `/auth/logout-all`                                                                 | Salir aquí o en todos los dispositivos   | Revocación comprobada también con access previamente emitido                            |
@@ -81,13 +81,13 @@ Pruebas obligatorias posteriores: dos renovaciones paralelas, sesión revocada d
 
 Pruebas posteriores: receptor SMTP local, rechazo/conexión fallida/timeout tras aceptación, no rollback ficticio de correo, reenvío limitado, cuenta existente/inexistente, enlace anterior utilizable y consumo paralelo. No se afirma entrega externa ni se pide un proveedor SMTP externo.
 
-## R2 de desarrollo: preparación externa, no ejecutar aún
+## Almacenamiento de avatares: S3 local real y R2 pendiente
 
-En Etapa 5 se necesitará un bucket privado dedicado a desarrollo, sin URL pública `r2.dev` ni dominio público. Propuesta: `fcmatch-dev-avatars`, objetos bajo `avatars/` con nombres aleatorios. Tokens de R2 con permiso de lectura/escritura de objetos limitado a ese bucket; no usar clave global de cuenta. Solicitar solo configurar en el `.env` local del Backend (ignorado) las variables existentes `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` y `R2_BUCKET`, o un mecanismo de secretos equivalente. **No pegarlas en chat ni capturas, y nunca copiarlas a clientes.**
+Desarrollo y pruebas usan SeaweedFS en loopback con buckets privados separados `fcmatch-dev-avatars`/`fcmatch-test-avatars`, identidades distintas y permisos por bucket. Sin identidad anónima, servicios auxiliares deshabilitados, filer HTTP cerrado y volumen protegido con JWT interno. Credenciales generadas en `.local/storage/` ignorado; el usuario del sistema operativo y los puertos gRPC loopback forman parte del entorno local de confianza, no un despliegue público. Adaptador configurable `STORAGE_PROVIDER=disabled|s3-local|r2`. S3 local falla en producción; no hay fallback automático. HTTP firmado solo en `127.0.0.1`; producción R2 usa HTTPS y necesitará credenciales y aceptación real externas futuras.
 
-El backend recibe y valida la imagen, la sube y entrega URL HTTPS firmada de lectura de máximo 5 min para el avatar público. No expone objetos de evidencias ni genera firmas para claves arbitrarias. CORS de subida directa al bucket no es necesario: las subidas pasan por la API. La sustitución conserva el objeto anterior hasta confirmar BD; limpiar fallos/objetos huérfanos de forma reintentable sin borrar evidencias. No se añade una política de expiración global al bucket que elimine fotos vigentes.
+El backend valida, decodifica y recodifica imágenes sin metadatos, genera claves `avatars/` aleatorias de 128 bits y entrega URL firmada ≤5 min. No firma claves elegidas por clientes ni permite URLs de entrada. La sustitución conserva el objeto anterior hasta commit. Diario técnico PostgreSQL registra reservas/activos/retirados para no borrar una imagen activa ante commit ambiguo y permitir limpieza reintentable; reservas abandonadas se retiran tras 15 min. No se añade expiración global ni almacenamiento de evidencias de torneos.
 
-Prueba real con imagen sintética no personal: escritura, lectura por firma, rechazo de lectura anónima, expiración y eliminación; sin publicar URL firmada ni capturas sensibles. Criterio de aceptación de avatares queda pendiente hasta contar con esa evidencia. No es necesario disponer de R2 para validar el contrato de Etapa 1.
+Aceptación con imágenes sintéticas, PostgreSQL/SMTP/S3 reales: subida, sustitución, lectura firmada, rechazo anónimo/firma alterada/vencida, borrado, titularidad, concurrencia y fallos. No se imprimen ni publican firmas, imágenes personales o secretos. La guía Cloudflare entregada anteriormente se conserva como antecedente: no configurar R2 durante este desarrollo.
 
 ## Dependencias y verificaciones de Etapa 1
 

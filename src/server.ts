@@ -11,6 +11,9 @@ import { SessionsRepository } from './modules/users/repository/sessions.js';
 import { SessionsService } from './modules/users/service/sessions.js';
 import { createMailTransport } from './shared/mail/transport.js';
 import { createVerificationDelivery } from './modules/users/service/verification-mail.js';
+import { ProfilesRepository } from './modules/users/repository/profiles.js';
+import { ProfilesService } from './modules/users/service/profiles.js';
+import { createAvatarStorage } from './shared/storage/avatars.js';
 
 const config = loadConfig();
 const identityConfig = loadIdentityConfig(config);
@@ -44,22 +47,41 @@ const sessions = new SessionsService(
     'reset',
   ),
 );
+const storage = createAvatarStorage(config);
+if (storage) await storage.verify();
+const profiles = new ProfilesService(
+  new ProfilesRepository(database),
+  sessions,
+  service,
+  storage,
+  identityConfig.csrfSecret,
+  createVerificationDelivery(
+    (message) => mail.sendMail(message),
+    config.SMTP_FROM,
+    identityConfig.webOrigin,
+    undefined,
+    'email-change',
+  ),
+);
 const server = createApp(config, database, {
   service,
   config: identityConfig,
   sessions,
+  profiles,
 }).listen(config.PORT, config.HOST, () => {
   console.info(
     `FCMatch API disponible en http://${config.HOST}:${config.PORT}/api/v1/health`,
   );
 });
 let closing = false;
+server.requestTimeout = 30_000;
 function shutdown() {
   if (closing) return;
   closing = true;
   const timeout = setTimeout(() => process.exit(1), 10_000).unref();
   server.close(() => {
     mail.close();
+    storage?.close();
     void database.end().then(() => {
       clearTimeout(timeout);
       process.exit(0);

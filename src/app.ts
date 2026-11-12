@@ -10,6 +10,8 @@ import { registrationRoutes } from './modules/users/routes/registration.js';
 import type { RegistrationService } from './modules/users/service/registration.js';
 import type { IdentityConfig } from './shared/config/identity.js';
 import type { SessionsService } from './modules/users/service/sessions.js';
+import type { ProfilesService } from './modules/users/service/profiles.js';
+import { profilesRoutes } from './modules/users/routes/profiles.js';
 
 // La composición habilita solo las operaciones de identidad autorizadas.
 export function createApp(
@@ -19,6 +21,7 @@ export function createApp(
     service: RegistrationService;
     config: IdentityConfig;
     sessions?: SessionsService;
+    profiles?: ProfilesService;
   },
 ) {
   const app = express();
@@ -62,6 +65,11 @@ export function createApp(
     app.use(
       '/api/v1/auth',
       registrationRoutes(identity.service, identity.config, identity.sessions),
+    );
+  if (identity?.profiles && identity.sessions)
+    app.use(
+      '/api/v1/users',
+      profilesRoutes(identity.profiles, identity.sessions, identity.config),
     );
   app.use(express.json({ limit: '64kb' }));
   app.get('/api/v1/health', async (_req, res) => {

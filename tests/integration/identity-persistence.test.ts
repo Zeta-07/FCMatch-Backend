@@ -203,7 +203,7 @@ test('identidad BD: cuatro tablas, UUID, timestamptz y migración repetible', as
   );
   assert.deepEqual(
     actual.rows.map((row) => row.table_name),
-    tables,
+    [...tables, 'avatar_objects'].sort(),
   );
   const columns = await pool.query<{
     table_name: string;
@@ -211,8 +211,8 @@ test('identidad BD: cuatro tablas, UUID, timestamptz y migración repetible', as
     data_type: string;
   }>(
     `SELECT table_name, column_name, data_type FROM information_schema.columns
-     WHERE table_schema = $1 AND column_name IN ('id', 'created_at', 'updated_at')`,
-    ['fcmatch'],
+      WHERE table_schema = $1 AND table_name = ANY($2::text[]) AND column_name IN ('id', 'created_at', 'updated_at')`,
+    ['fcmatch', tables],
   );
   assert.equal(columns.rowCount, 12);
   for (const column of columns.rows) {

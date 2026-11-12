@@ -357,7 +357,7 @@ paths:
     get:
       operationId: getMyProfile
       tags: [Perfiles]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Consultar datos de la propia cuenta verificada
       responses:
         '200':
@@ -369,7 +369,7 @@ paths:
     patch:
       operationId: updateMyProfile
       tags: [Perfiles]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Editar exclusivamente username y liga
       description: No admite email, publicId, rol, verificación, estadísticas o claves de almacenamiento.
       security:
@@ -400,7 +400,7 @@ paths:
     post:
       operationId: requestMyEmailChange
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Solicitar verificación de un nuevo correo
       description: |
         Requiere contraseña actual. Conserva el correo anterior hasta confirmar.
@@ -436,7 +436,7 @@ paths:
     post:
       operationId: confirmMyEmailChange
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Confirmar el nuevo correo de la cuenta autenticada
       description: |
         Verifica que el token pertenece al usuario, consume una sola vez y aplica
@@ -466,8 +466,8 @@ paths:
     put:
       operationId: replaceMyAvatar
       tags: [Perfiles]
-      x-implementation-status: planned
-      summary: Subir o sustituir la foto propia en R2
+      x-implementation-status: implemented
+      summary: Subir o sustituir la foto propia en almacenamiento S3 privado
       description: |
         Un archivo JPG/JPEG, PNG o WebP de máximo 5242880 bytes (5 MiB).
         Validación real de contenido y decodificación en backend, no solo MIME o
@@ -521,7 +521,7 @@ paths:
     delete:
       operationId: deleteMyAvatar
       tags: [Perfiles]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Eliminar la foto propia de forma idempotente
       security:
         - AccessToken: []
@@ -543,7 +543,7 @@ paths:
     get:
       operationId: searchUsers
       tags: [Perfiles]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Buscar perfiles por username desde una sesión verificada
       parameters:
         - name: search
@@ -589,7 +589,7 @@ paths:
     get:
       operationId: getPublicProfile
       tags: [Perfiles]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Consultar un perfil público sin iniciar sesión
       security: []
       parameters:
@@ -991,7 +991,7 @@ components:
         url:
           type: string
           format: uri
-          description: URL HTTPS firmada de R2, lectura de avatar público, máximo 5 minutos.
+          description: URL S3 firmada para lectura del avatar público, máximo 5 minutos. HTTPS en R2 previsto para producción; HTTP solo en 127.0.0.1 para S3 local de desarrollo/pruebas. Integración real R2 pendiente.
         expiresAt:
           type: string
           format: date-time

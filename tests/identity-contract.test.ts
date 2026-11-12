@@ -163,6 +163,12 @@ test('contrato identidad: limita las operaciones a RF-01 a RF-06 y health', () =
           '/auth/forgot-password',
           '/auth/reset-password',
           '/auth/change-password',
+          '/users/me',
+          '/users/me/email-change',
+          '/users/me/email-change/confirm',
+          '/users/me/avatar',
+          '/users',
+          '/users/{publicId}',
         ].includes(path);
       assert.equal(
         item['x-implementation-status'],
@@ -299,7 +305,7 @@ test('contrato identidad: declarar operaciones planned no las implementa ni modi
   await request(app).get('/api/v1/health').expect(200);
   for (const [path, methods] of Object.entries(contract.paths)) {
     for (const [method, item] of Object.entries(methods)) {
-      if (item['x-implementation-status'] !== 'planned') continue;
+      if (path === '/health') continue;
       const url = `/api/v1${path.replace('{publicId}', '00000000-0000-4000-8000-000000000001')}`;
       const client = request(app);
       const response =

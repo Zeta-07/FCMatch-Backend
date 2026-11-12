@@ -1,12 +1,12 @@
 # FCMatch Backend
 
-## Fase 1 — Etapa 4: autenticación y sesiones
+## Fase 1 — Etapa 5: perfiles, búsqueda y avatares
 
-Las Etapas 1–3 aprobadas están publicadas en `feature/fase-1-identidad`, con PR #5 abiertos hacia develop. Etapa 4 añade login verificado, JWT/refresh rotatorio, logout actual/global y recuperación/cambio de contraseña con revocación; [informe y límites](docs/fase-1-etapa-4-verificacion.md). Publicación autorizada si las verificaciones pasan; no fusiones, perfiles/avatares, interfaces o Etapa 5.
+Etapas 1–4 aprobadas; Etapa 5 añade perfiles/búsqueda, cambio de correo con SMTP local y avatares S3 reales; [informe y límites](docs/fase-1-etapa-5-verificacion.md). El propietario autorizó publicación en `feature/fase-1-identidad` tras checks satisfactorios y actualización de los PR #5. Sin fusiones, force push, interfaces o Etapa 6.
 
 Informe compartido de verificación y publicación: [docs/fase-0-verificacion.md](docs/fase-0-verificacion.md).
 
-API REST única en Node.js + Express + TypeScript estricto. Doce operaciones están implementadas; las otras ocho de perfiles/avatares/cambio de correo siguen `planned` y responden 404. Sin operaciones de torneos.
+API REST única en Node.js + Express + TypeScript estricto. Veinte operaciones del contrato de identidad, sin operaciones de torneos. Clientes conservan modelos y no implementan aún interfaces funcionales de identidad.
 
 ## Requisitos
 
@@ -37,15 +37,15 @@ npm audit
 npm outdated
 ```
 
-`check` ejecuta integridad de skills, tipos, lint, formato, OpenAPI, **32 unitarias/HTTP/configuración/contrato, 52 integraciones reales** y build. Incluye sesiones, JWT/CSRF, hashing y entrega/errores SMTP, además de regresiones anteriores. Requiere `TEST_DATABASE_URL` distinta de desarrollo y nombre terminado en `_test`; no fixtures ni Down sobre desarrollo.
+`check` ejecuta integridad de skills, tipos, lint, formato, OpenAPI, **35 unitarias/HTTP/configuración/contrato, 68 integraciones reales** y build. Requiere `TEST_DATABASE_URL` distinta de desarrollo y nombre terminado en `_test`, además de SeaweedFS iniciado y buckets preparados; no fixtures ni Down sobre desarrollo.
 
 El contrato es `docs/openapi.yaml`. `npm run api:generate` genera los tipos en `src/shared/api/`. No se implementan por adelantado endpoints de otras fases.
 
 ## Correo y almacenamiento
 
-En otra terminal, `npm run infra:mail` inicia el capturador SMTP en `127.0.0.1:1025`. Acepta mensajes y descarta su contenido sin registrar códigos ni tokens. `npm run infra:check` comprueba PostgreSQL, SMTP y, si están completas sus variables, acceso al bucket R2.
+En otra terminal, `npm run infra:mail` inicia el capturador SMTP en `127.0.0.1:1025`. Acepta mensajes y descarta su contenido sin registrar códigos ni tokens. `npm run infra:check` comprueba PostgreSQL, SMTP y el bucket del proveedor de almacenamiento seleccionado; no acredita por sí solo privacidad ni integración R2 cuando se usa S3 local.
 
-R2 usa el SDK S3 oficial, región `auto` y endpoint de Cloudflare. Sin credenciales informa **pendiente**, no éxito. `HeadBucket` acredita acceso, no privacidad: verifica en Cloudflare que el bucket no tenga dominio público ni `r2.dev` habilitado. No hay endpoints de subida en esta fase.
+Avatares: **SeaweedFS 4.53 local real**, gratuito y mantenido, sin tarjeta/Docker/Cloudflare. Preparación y límites en el informe de Etapa 5: `node scripts/download-storage.mjs`, iniciar `node scripts/storage-local.mjs`, luego en otra terminal `node scripts/storage-local.mjs --init` y `--configure`. Secretos solo en `.local/`/`.env` ignorados. `STORAGE_PROVIDER=s3-local` está prohibido en producción; `r2` conserva SDK S3/HTTPS/region auto, integración real R2 **pendiente**. Cambiar proveedor no copia datos automáticamente. `HeadBucket` no acredita privacidad; las pruebas verifican además rechazo anónimo y URLs firmadas. Para recuperar borrados/reservas abandonadas en lotes de hasta 50 usuarios: `node --env-file=.env --import tsx scripts/cleanup-avatars.ts`; no borra claves activas ni hace barridos de objetos ajenos al diario. Sin jobs de fases posteriores.
 
 ## MCP
 
