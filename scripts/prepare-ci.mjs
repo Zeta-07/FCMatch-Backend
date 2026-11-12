@@ -25,6 +25,7 @@ await writeFile(
     'CORS_ORIGINS=http://localhost:4200,http://localhost:4300,http://localhost:8100',
     `IDENTITY_CSRF_SECRET=${randomBytes(32).toString('hex')}`,
     `IDENTITY_ABUSE_SECRET=${randomBytes(32).toString('hex')}`,
+    `IDENTITY_JWT_SECRET=${randomBytes(32).toString('hex')}`,
     'IDENTITY_WEB_ORIGIN=http://localhost:4200',
     'IDENTITY_MOBILE_ORIGIN=http://localhost:8100',
     'IDENTITY_API_ORIGIN=http://localhost:3000',

@@ -170,7 +170,7 @@ paths:
     post:
       operationId: loginUser
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Iniciar sesión con correo verificado
       description: |
         Cuenta inexistente, contraseña incorrecta, correo sin verificar o bloqueo
@@ -201,7 +201,7 @@ paths:
     post:
       operationId: refreshBrowserSession
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Rotar el refresh de la sesión navegador
       description: |
         Sin refresh en cuerpo ni query. La rotación es atómica, no amplía la vida
@@ -231,7 +231,7 @@ paths:
     post:
       operationId: logoutBrowserSession
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Revocar sesión actual y limpiar sus cookies
       description: |
         Idempotente con contexto CSRF válido, incluso sin sesión vigente.
@@ -257,7 +257,7 @@ paths:
     post:
       operationId: logoutAllUserSessions
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Revocar todas las sesiones de la cuenta
       description: Incluye la sesión actual; revocación comprobada también al usar access tokens.
       security:
@@ -278,7 +278,7 @@ paths:
     post:
       operationId: requestPasswordReset
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Solicitar recuperación sin revelar si existe la cuenta
       description: Misma aceptación ante entrega SMTP fallida; el correo contiene el único token utilizable.
       security:
@@ -302,7 +302,7 @@ paths:
     post:
       operationId: resetUserPassword
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Restablecer contraseña y revocar sesiones
       security:
         - BrowserCsrf: []
@@ -329,7 +329,7 @@ paths:
     post:
       operationId: changeUserPassword
       tags: [Identidad]
-      x-implementation-status: planned
+      x-implementation-status: implemented
       summary: Cambiar contraseña acreditando la actual y revocar sesiones
       security:
         - AccessToken: []

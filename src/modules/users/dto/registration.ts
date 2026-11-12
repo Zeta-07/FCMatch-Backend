@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { ApiError } from '../../../shared/errors/api-error.js';
 
-const email = z.string().trim().toLowerCase().max(254).pipe(z.email());
-const password = z.string().refine((value) => {
+export const email = z.string().trim().toLowerCase().max(254).pipe(z.email());
+export const password = z.string().refine((value) => {
   const length = [...value].length;
   return (
     length >= 12 &&

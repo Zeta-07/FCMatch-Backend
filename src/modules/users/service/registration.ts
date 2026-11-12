@@ -71,7 +71,7 @@ export class RegistrationService {
     await this.repository.incrementBucket(client, bucket.id);
     return { allowed: true, retry: 0 };
   }
-  private async admit(email: string, ip: string) {
+  async admitMail(email: string, ip: string) {
     const result = await this.transaction(async (client) => {
       const ipLimit = await this.bucket(client, 'email_ip', ip, 900, 10, 0);
       if (!ipLimit.allowed) return { ipLimit, identity: false };
@@ -95,7 +95,7 @@ export class RegistrationService {
     return result.identity;
   }
   async register(input: Registration, ip: string) {
-    if (!(await this.admit(input.email, ip))) return;
+    if (!(await this.admitMail(input.email, ip))) return;
     // La misma operación costosa para correos nuevos y existentes, fuera de locks SQL.
     const passwordHash = await this.hashPassword(input.password);
     const token = randomBytes(32).toString('base64url');
@@ -131,7 +131,7 @@ export class RegistrationService {
     if (delivery) await this.deliver(delivery);
   }
   async resend(email: string, ip: string) {
-    if (!(await this.admit(email, ip))) return;
+    if (!(await this.admitMail(email, ip))) return;
     const token = randomBytes(32).toString('base64url');
     const delivery = await this.transaction(async (client) => {
       const user = await this.repository.userByEmail(client, email);

@@ -156,6 +156,13 @@ test('contrato identidad: limita las operaciones a RF-01 a RF-06 y health', () =
           '/auth/register',
           '/auth/verify-email',
           '/auth/resend-verification',
+          '/auth/login',
+          '/auth/refresh',
+          '/auth/logout',
+          '/auth/logout-all',
+          '/auth/forgot-password',
+          '/auth/reset-password',
+          '/auth/change-password',
         ].includes(path);
       assert.equal(
         item['x-implementation-status'],

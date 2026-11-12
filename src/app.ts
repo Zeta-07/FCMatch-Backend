@@ -9,12 +9,17 @@ import { errorHandler } from './shared/middleware/errors.js';
 import { registrationRoutes } from './modules/users/routes/registration.js';
 import type { RegistrationService } from './modules/users/service/registration.js';
 import type { IdentityConfig } from './shared/config/identity.js';
+import type { SessionsService } from './modules/users/service/sessions.js';
 
-// La composición de identidad habilita solo las operaciones autorizadas de Etapa 3.
+// La composición habilita solo las operaciones de identidad autorizadas.
 export function createApp(
   config: Config,
   database: Pick<Pool, 'query'>,
-  identity?: { service: RegistrationService; config: IdentityConfig },
+  identity?: {
+    service: RegistrationService;
+    config: IdentityConfig;
+    sessions?: SessionsService;
+  },
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -56,7 +61,7 @@ export function createApp(
   if (identity)
     app.use(
       '/api/v1/auth',
-      registrationRoutes(identity.service, identity.config),
+      registrationRoutes(identity.service, identity.config, identity.sessions),
     );
   app.use(express.json({ limit: '64kb' }));
   app.get('/api/v1/health', async (_req, res) => {

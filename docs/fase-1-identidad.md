@@ -2,9 +2,9 @@
 
 ## Estado y autorización
 
-El propietario aprobó el 11/11/2026 implementar RF-01 a RF-06 por etapas. **Etapas 1 y 2 aprobadas/publicadas; Etapa 3 autorizada: registro y verificación de correo exclusivamente.** Health, bootstrap CSRF, registro, verificación y reenvío son las cinco operaciones implementadas. Las quince operaciones `planned` del OpenAPI todavía responden 404; no hay login ni sesiones ejecutables. Evidencia de esta etapa en `docs/fase-1-etapa-3-verificacion.md`. Un tipo generado por sí solo no acredita un flujo implementado.
+El propietario aprobó el 11/11/2026 implementar RF-01 a RF-06 por etapas. **Etapas 1–3 aprobadas/publicadas; Etapa 4 autorizada: autenticación y sesiones exclusivamente.** Health, registro/verificación/CSRF y siete operaciones de sesiones/contraseña son doce implementadas. Las ocho operaciones `planned` de perfiles/avatares/cambio de correo todavía responden 404. Evidencia en `docs/fase-1-etapa-4-verificacion.md`. Un tipo generado por sí solo no acredita un flujo implementado.
 
-Se permiten cambios locales y ramas desde `develop` sincronizado con `main`. El propietario aprobó Etapas 1 y 2 y autoriza sus commits/push en la rama feature; no fusiones. Autoriza continuar con Etapa 3 exclusivamente de registro/verificación y publicar al finalizar si las pruebas pasan. Etapa 4 requiere nueva aprobación. Etapa 2 incorpora solo cuatro tablas y una migración nueva; no se modifica la migración aplicada de Fase 0. Angular 22.2.4 está aprobado como excepción; los párrafos de incidencias de Etapa 1 son históricos. Ver DT-010/011 y el informe de Etapa 2.
+Se permiten cambios locales y ramas desde `develop` sincronizado con `main`. El propietario aprobó Etapas 1–3 y autoriza Etapa 4 y su publicación si las verificaciones pasan, actualizando PR #5 sin fusiones. Etapa 5 requiere nueva aprobación. Se conservan tablas/migraciones aplicadas y excepción Angular 22.2.4; incidencias de Etapa 1 son históricas. Ver DT-010/011/013 e informes por etapa.
 
 Decisiones expresas:
 

@@ -1,12 +1,12 @@
 # FCMatch Backend
 
-## Fase 1 — Etapa 3: registro y verificación
+## Fase 1 — Etapa 4: autenticación y sesiones
 
-Las Etapas 1–2 aprobadas están publicadas en `feature/fase-1-identidad`, con PR #5 abierto hacia develop en los tres repositorios. Etapa 3 incorpora registro Argon2id, verificación explícita/reenvío de correo y CSRF del contrato, con PostgreSQL y SMTP local reales; [informe y límites](docs/fase-1-etapa-3-verificacion.md). No implementa login, JWT, sesiones autenticadas ni interfaces. Su publicación está autorizada si las verificaciones pasan; ninguna fusión ni Etapa 4 están autorizadas.
+Las Etapas 1–3 aprobadas están publicadas en `feature/fase-1-identidad`, con PR #5 abiertos hacia develop. Etapa 4 añade login verificado, JWT/refresh rotatorio, logout actual/global y recuperación/cambio de contraseña con revocación; [informe y límites](docs/fase-1-etapa-4-verificacion.md). Publicación autorizada si las verificaciones pasan; no fusiones, perfiles/avatares, interfaces o Etapa 5.
 
 Informe compartido de verificación y publicación: [docs/fase-0-verificacion.md](docs/fase-0-verificacion.md).
 
-API REST única en Node.js + Express + TypeScript estricto. Health y cuatro operaciones de registro/verificación están implementadas; las otras quince operaciones de identidad del contrato siguen `planned` y responden 404. Sin operaciones de torneos.
+API REST única en Node.js + Express + TypeScript estricto. Doce operaciones están implementadas; las otras ocho de perfiles/avatares/cambio de correo siguen `planned` y responden 404. Sin operaciones de torneos.
 
 ## Requisitos
 
@@ -27,7 +27,7 @@ npm run dev
 
 Para un clon independiente configura `PG_BIN` con el directorio `bin` de PostgreSQL, o prepara una instancia y copia `.env.example` a `.env` con sus credenciales. El script local genera contraseñas aleatorias y no sobrescribe un `.env` existente. No requiere privilegios de administrador. Para detener su instancia: `./scripts/postgres-local.ps1 -Action stop`.
 
-Antes de arrancar, completa también `IDENTITY_*` según `.env.example`: dos secretos aleatorios independientes de al menos 32 bytes en hexadecimal y los orígenes exactos web/móvil/API. Genera y guarda esos secretos directamente en el entorno local ignorado, nunca en Git ni logs. Los dos orígenes cliente deben figurar en `CORS_ORIGINS`. Sin configuración válida el servidor falla de forma segura; no incluye secretos por defecto. El bootstrap CSRF es obligatorio antes de las mutaciones. El enlace del correo apunta a la futura pantalla, todavía no implementada; esta etapa se verifica por API/SMTP local.
+Antes de arrancar, completa `IDENTITY_*` según `.env.example`: tres secretos aleatorios independientes de al menos 32 bytes en hexadecimal (CSRF, abuso y JWT) y los orígenes exactos web/móvil/API. Guárdalos directamente en el entorno local ignorado, nunca Git/logs. Los dos clientes deben figurar en `CORS_ORIGINS`. El servidor falla sin configuración válida, sin secretos por defecto. Bootstrap CSRF obligatorio antes de mutaciones; tras login la prueba queda ligada a su familia. Los enlaces de correo apuntan a pantallas futuras, todavía no implementadas; esta etapa se verifica por API/SMTP local.
 
 ## Verificaciones
 
@@ -37,7 +37,7 @@ npm audit
 npm outdated
 ```
 
-`check` ejecuta integridad de skills, tipos, lint, formato, validación OpenAPI, **27 pruebas unitarias/HTTP/configuración/contrato, 31 integraciones reales** y compilación. Incluye registro, CSRF, hashing y entrega/errores SMTP, además de regresiones anteriores. Las pruebas requieren `TEST_DATABASE_URL` distinta de desarrollo y un nombre terminado en `_test`; no ejecutan fixtures ni Down sobre desarrollo.
+`check` ejecuta integridad de skills, tipos, lint, formato, OpenAPI, **32 unitarias/HTTP/configuración/contrato, 52 integraciones reales** y build. Incluye sesiones, JWT/CSRF, hashing y entrega/errores SMTP, además de regresiones anteriores. Requiere `TEST_DATABASE_URL` distinta de desarrollo y nombre terminado en `_test`; no fixtures ni Down sobre desarrollo.
 
 El contrato es `docs/openapi.yaml`. `npm run api:generate` genera los tipos en `src/shared/api/`. No se implementan por adelantado endpoints de otras fases.
 
