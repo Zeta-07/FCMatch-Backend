@@ -324,10 +324,23 @@ test('perfiles reales: propio/público, privacidad, edición y publicId inmutabl
   const f = await fixture();
   const own = await f.call('get', '/users/me');
   assert.equal(own.status, 200);
+  assert.deepEqual(Object.keys(own.body).sort(), [
+    'email',
+    'emailVerifiedAt',
+    'profile',
+  ]);
+  assert.deepEqual(Object.keys(own.body.profile).sort(), [
+    'avatar',
+    'history',
+    'leagueName',
+    'publicId',
+    'statistics',
+    'username',
+  ]);
   assert.equal(own.body.email, f.user.email);
-  assert.equal(own.body.publicId, f.user.publicId);
-  assert.equal(own.body.statistics, null);
-  assert.deepEqual(own.body.history, []);
+  assert.equal(own.body.profile.publicId, f.user.publicId);
+  assert.equal(own.body.profile.statistics, null);
+  assert.deepEqual(own.body.profile.history, []);
   const publicProfile = await request(app).get(
     `/api/v1/users/${f.user.publicId}`,
   );
@@ -349,8 +362,13 @@ test('perfiles reales: propio/público, privacidad, edición y publicId inmutabl
     leagueName: ' Liga de prueba ',
   });
   assert.equal(edit.status, 200);
-  assert.equal(edit.body.leagueName, 'Liga de prueba');
-  assert.equal(edit.body.publicId, f.user.publicId);
+  assert.deepEqual(Object.keys(edit.body).sort(), [
+    'email',
+    'emailVerifiedAt',
+    'profile',
+  ]);
+  assert.equal(edit.body.profile.leagueName, 'Liga de prueba');
+  assert.equal(edit.body.profile.publicId, f.user.publicId);
   assert.equal(
     (await f.call('patch', '/users/me', { publicId: randomUUID() })).status,
     422,
@@ -361,7 +379,8 @@ test('perfiles reales: propio/público, privacidad, edición y publicId inmutabl
     422,
   );
   assert.equal(
-    (await f.call('patch', '/users/me', { leagueName: null })).body.leagueName,
+    (await f.call('patch', '/users/me', { leagueName: null })).body.profile
+      .leagueName,
     null,
   );
   assert.equal(
@@ -425,7 +444,10 @@ test('avatares reales: subir/leer/sustituir/borrar en S3 con privacidad y propie
     (await other.call('delete', `/users/${f.user.publicId}/avatar`)).status,
     404,
   );
-  assert.equal((await other.call('get', '/users/me')).body.avatar, null);
+  assert.equal(
+    (await other.call('get', '/users/me')).body.profile.avatar,
+    null,
+  );
   const second = await f.call('put', '/users/me/avatar').attach('file', bytes, {
     filename: 'ignored.jpg',
     contentType: 'image/png',
@@ -435,7 +457,7 @@ test('avatares reales: subir/leer/sustituir/borrar en S3 con privacidad y propie
   assert.equal((await f.call('delete', '/users/me/avatar')).status, 204);
   assert.equal((await fetch(second.body.url)).status, 404);
   assert.equal((await f.call('delete', '/users/me/avatar')).status, 204);
-  assert.equal((await f.call('get', '/users/me')).body.avatar, null);
+  assert.equal((await f.call('get', '/users/me')).body.profile.avatar, null);
 });
 test('avatares reales: errores de imagen/multipart/CSRF no modifican el perfil', async () => {
   const f = await fixture();
@@ -494,7 +516,7 @@ test('avatares reales: errores de imagen/multipart/CSRF no modifican el perfil',
     ).status,
     403,
   );
-  assert.equal((await f.call('get', '/users/me')).body.avatar, null);
+  assert.equal((await f.call('get', '/users/me')).body.profile.avatar, null);
 });
 test('avatares reales: fallos de almacenamiento conservan anterior y borrado reintentable', async () => {
   const f = await fixture();
@@ -515,7 +537,7 @@ test('avatares reales: fallos de almacenamiento conservan anterior y borrado rei
   failStorage = 'remove';
   assert.equal((await f.call('delete', '/users/me/avatar')).status, 503);
   failStorage = '';
-  assert.equal((await f.call('get', '/users/me')).body.avatar, null);
+  assert.equal((await f.call('get', '/users/me')).body.profile.avatar, null);
   assert.ok(
     (
       await pool.query(
@@ -587,6 +609,11 @@ test('correo real: contraseña actual, titular, SMTP y confirmación única sin 
     token: value,
   });
   assert.equal(confirmed.status, 200);
+  assert.deepEqual(Object.keys(confirmed.body).sort(), [
+    'email',
+    'emailVerifiedAt',
+    'profile',
+  ]);
   assert.equal(confirmed.body.email, email);
   assert.equal(
     (await f.call('post', '/users/me/email-change/confirm', { token: value }))

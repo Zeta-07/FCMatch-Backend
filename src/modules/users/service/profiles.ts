@@ -68,7 +68,7 @@ export class ProfilesService {
     };
     return own
       ? {
-          ...profile,
+          profile,
           email: row.email,
           emailVerifiedAt: row.email_verified_at!.toISOString(),
         }
