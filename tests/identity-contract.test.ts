@@ -28,6 +28,10 @@ interface Schema {
   maximum?: number;
   maxItems?: number;
   writeOnly?: boolean;
+  readOnly?: boolean;
+  pattern?: string;
+  minLength?: number;
+  maxLength?: number;
   'x-max-file-size-bytes'?: number;
 }
 
@@ -294,6 +298,27 @@ test('contrato identidad: rechaza asignación masiva y documenta límites de car
       response.headers?.['Cache-Control'],
       'Respuesta de identidad sin no-store',
     );
+  }
+});
+
+test('contrato ID numérico: representación opt-in sin alterar el perfil UUID anterior', () => {
+  const legacy = schema('PublicProfile');
+  const numeric = schema('NumericPublicProfile');
+  assert.equal(legacy.properties?.['publicNumber'], undefined);
+  assert.equal(legacy.additionalProperties, false);
+  assert.equal(numeric.additionalProperties, false);
+  assert.equal(numeric.properties?.['email'], undefined);
+  assert.equal(numeric.properties?.['id'], undefined);
+  assert.equal(numeric.properties?.['publicNumber']?.readOnly, true);
+  assert.equal(numeric.properties?.['publicId']?.readOnly, true);
+  const number = schema('PublicNumber');
+  assert.equal(number.type, 'string');
+  assert.equal(number.minLength, 8);
+  assert.equal(number.maxLength, 8);
+  assert.equal(number.pattern, '^[1-9][0-9]{7}$');
+  for (const name of ['UpdateProfileRequest', 'RegisterRequest']) {
+    assert.equal(schema(name).properties?.['publicNumber'], undefined);
+    assert.equal(schema(name).additionalProperties, false);
   }
 });
 

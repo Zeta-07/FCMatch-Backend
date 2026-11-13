@@ -544,17 +544,23 @@ paths:
       operationId: searchUsers
       tags: [Perfiles]
       x-implementation-status: implemented
-      summary: Buscar perfiles por username desde una sesión verificada
+      summary: Buscar perfiles por username o ID numérico desde una sesión verificada
+      description: Enviar exactamente search o publicNumber. El ID numérico es una coincidencia exacta sin cursor. Accept application/vnd.fcmatch.identity.v2+json añade publicNumber; application/json conserva el contrato anterior y los cursores UUID.
       parameters:
         - name: search
           in: query
-          required: true
-          description: Prefijo de username, insensible a mayúsculas; no busca por correo.
+          required: false
+          description: Prefijo de username, insensible a mayúsculas; excluyente con publicNumber. No busca por correo.
           schema:
             type: string
             minLength: 2
             maxLength: 30
             pattern: '^[A-Za-z0-9_]+$'
+        - name: publicNumber
+          in: query
+          description: ID numérico exacto; excluyente con search y cursor. Un username numérico sigue buscándose con search.
+          schema:
+            $ref: '#/components/schemas/PublicNumber'
         - name: limit
           in: query
           schema:
@@ -579,6 +585,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UsersPage'
+            application/vnd.fcmatch.identity.v2+json:
+              schema:
+                $ref: '#/components/schemas/NumericUsersPage'
         '401':
           $ref: '#/components/responses/Unauthenticated'
         '422':
@@ -597,8 +606,10 @@ paths:
           in: path
           required: true
           schema:
-            type: string
-            format: uuid
+            anyOf:
+              - type: string
+                format: uuid
+              - $ref: '#/components/schemas/PublicNumber'
       responses:
         '200':
           description: Perfil público; correo y datos de sesión excluidos.
@@ -609,6 +620,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PublicProfile'
+            application/vnd.fcmatch.identity.v2+json:
+              schema:
+                $ref: '#/components/schemas/NumericPublicProfile'
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
@@ -731,6 +745,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/OwnProfile'
+        application/vnd.fcmatch.identity.v2+json:
+          schema:
+            $ref: '#/components/schemas/NumericOwnProfile'
     InvalidActionToken:
       description: ACTION_TOKEN_INVALID; token no utilizable, sin distinguir causa ni revelar cuentas.
       headers:
@@ -995,6 +1012,75 @@ components:
         expiresAt:
           type: string
           format: date-time
+    PublicNumber:
+      type: string
+      pattern: '^[1-9][0-9]{7}$'
+      minLength: 8
+      maxLength: 8
+      description: Identificador público generado por backend, único, permanente e inmutable. No es una credencial ni autoriza operaciones. No se recicla.
+    NumericPublicProfile:
+      type: object
+      additionalProperties: false
+      required:
+        [
+          publicId,
+          publicNumber,
+          username,
+          leagueName,
+          avatar,
+          statistics,
+          history,
+        ]
+      properties:
+        publicId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: UUID público anterior, conservado exclusivamente para compatibilidad. No mostrar en clientes nuevos.
+        publicNumber:
+          $ref: '#/components/schemas/PublicNumber'
+          readOnly: true
+        username:
+          $ref: '#/components/schemas/Username'
+        leagueName:
+          type: [string, 'null']
+          maxLength: 100
+        avatar:
+          anyOf:
+            - $ref: '#/components/schemas/Avatar'
+            - type: 'null'
+        statistics:
+          type: 'null'
+        history:
+          type: array
+          maxItems: 0
+          items:
+            type: object
+    NumericOwnProfile:
+      type: object
+      additionalProperties: false
+      required: [profile, email, emailVerifiedAt]
+      properties:
+        profile:
+          $ref: '#/components/schemas/NumericPublicProfile'
+        email:
+          $ref: '#/components/schemas/Email'
+        emailVerifiedAt:
+          type: string
+          format: date-time
+    NumericUsersPage:
+      type: object
+      additionalProperties: false
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          maxItems: 50
+          items:
+            $ref: '#/components/schemas/NumericPublicProfile'
+        nextCursor:
+          type: [string, 'null']
+          description: Cursor firmado UUID anterior, sin cambios de formato ni ordenación.
     PublicProfile:
       type: object
       additionalProperties: false

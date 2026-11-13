@@ -4,6 +4,7 @@ import { IdentityRepository } from './identity.js';
 export type ProfileRow = {
   id: string;
   public_id: string;
+  public_number: number;
   username: string;
   league_name: string | null;
   avatar_key: string | null;
@@ -11,7 +12,7 @@ export type ProfileRow = {
   email_verified_at: Date | null;
 };
 const columns =
-  'id, public_id, username, league_name, avatar_key, email, email_verified_at';
+  'id, public_id, public_number, username, league_name, avatar_key, email, email_verified_at';
 export class ProfilesRepository extends IdentityRepository {
   async cleanupUsers(client: PoolClient) {
     return (
@@ -57,6 +58,14 @@ export class ProfilesRepository extends IdentityRepository {
         ],
       )
     ).rows[0]!;
+  }
+  async byPublicNumber(client: PoolClient, number: string) {
+    return (
+      await client.query<ProfileRow>(
+        `SELECT ${columns} FROM fcmatch.users WHERE public_number = $1::integer`,
+        [number],
+      )
+    ).rows[0];
   }
   async search(
     client: PoolClient,

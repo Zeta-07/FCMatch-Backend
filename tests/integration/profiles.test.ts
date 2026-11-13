@@ -72,6 +72,7 @@ let mail: ReturnType<typeof createMailTransport>;
 let real: NonNullable<ReturnType<typeof createAvatarStorage>>;
 let profiles: ProfilesService;
 let app: ReturnType<typeof createApp>;
+let numericApp: ReturnType<typeof createApp>;
 let passwords: Awaited<ReturnType<typeof createPasswordCrypto>>;
 before(async () => {
   assert.ok(
@@ -179,6 +180,11 @@ before(async () => {
     pool,
     { service: registration, config: identity, sessions, profiles },
   );
+  numericApp = createApp(
+    { ...base, CORS_ORIGINS: [identity.webOrigin, identity.mobileOrigin] },
+    pool,
+    { service: registration, config: identity, sessions, profiles },
+  );
 });
 after(async () => {
   failStorage = '';
@@ -222,7 +228,7 @@ after(async () => {
   await new Promise<void>((resolve) => smtp.close(() => resolve()));
   await pool.end();
 });
-async function fixture() {
+async function fixture(target = app) {
   const seed = randomUUID().replaceAll('-', '');
   const email = `${seed}@fcmatch.test`;
   const username = `pf_${seed.slice(0, 22)}`;
@@ -249,12 +255,12 @@ async function fixture() {
     return response;
   };
   capture(
-    await request(app)
+    await request(target)
       .get('/api/v1/auth/csrf')
       .set('Origin', identity.webOrigin),
   );
   const login = capture(
-    await request(app)
+    await request(target)
       .post('/api/v1/auth/login')
       .set('Origin', identity.webOrigin)
       .set('Cookie', header())
@@ -267,7 +273,7 @@ async function fixture() {
     path: string,
     body?: object,
   ) => {
-    const client = request(app);
+    const client = request(target);
     const req = client[method](`/api/v1${path}`)
       .set('Origin', identity.webOrigin)
       .set('Cookie', header())
@@ -389,6 +395,108 @@ test('perfiles reales: propio/público, privacidad, edición y publicId inmutabl
   );
   assert.equal((await request(app).get('/api/v1/users/me')).status, 401);
 });
+test('ID numérico real: negociación, enlaces UUID, privacidad, búsqueda exacta y autorización', async () => {
+  const app = numericApp;
+  const f = await fixture(app);
+  const other = await fixture(app);
+  const media = 'application/vnd.fcmatch.identity.v2+json';
+  const own = await f.call('get', '/users/me').set('Accept', media);
+  assert.equal(own.status, 200);
+  assert.match(
+    own.headers['content-type']!,
+    /application\/vnd\.fcmatch\.identity\.v2\+json/,
+  );
+  assert.match(own.headers['vary']!, /Accept/);
+  const number = own.body.profile.publicNumber;
+  const missing = await request(app)
+    .get('/api/v1/users/99999999')
+    .set('Accept', media);
+  assert.equal(missing.status, 404);
+  assert.match(missing.headers['content-type']!, /^application\/json/);
+  assert.match(number, /^[1-9][0-9]{7}$/);
+  assert.equal(own.body.profile.publicId, f.user.publicId);
+  for (const identifier of [number, f.user.publicId]) {
+    const value = await request(app)
+      .get(`/api/v1/users/${identifier}`)
+      .set('Accept', media);
+    assert.equal(value.status, 200);
+    assert.equal(value.body.publicNumber, number);
+    assert.equal(value.body.publicId, f.user.publicId);
+    assert.equal(value.body.email, undefined);
+    assert.equal(value.body.id, undefined);
+  }
+  const legacy = await f.call('get', '/users/me');
+  assert.equal(legacy.body.profile.publicNumber, undefined);
+  assert.equal(legacy.body.profile.publicId, f.user.publicId);
+  const exact = await f
+    .call('get', `/users?publicNumber=${number}`)
+    .set('Accept', media);
+  assert.equal(exact.status, 200);
+  assert.equal(exact.body.items.length, 1);
+  assert.equal(exact.body.items[0].publicNumber, number);
+  assert.equal(exact.body.nextCursor, null);
+  for (const query of [
+    `publicNumber=${number}&search=pf`,
+    `publicNumber=${number}&cursor=bad`,
+    'publicNumber=01234567',
+    'publicNumber=123456789',
+    'publicNumber=1e7',
+    'publicNumber=12345678%27',
+  ])
+    assert.equal((await f.call('get', `/users?${query}`)).status, 422);
+  assert.equal(
+    (await request(app).get(`/api/v1/users?publicNumber=${number}`)).status,
+    401,
+  );
+  assert.equal(
+    (
+      await request(app)
+        .get(`/api/v1/users/${number}`)
+        .set('Authorization', `Bearer ${number}`)
+    ).body.email,
+    undefined,
+  );
+  assert.equal(
+    (
+      await request(app)
+        .get('/api/v1/users/me')
+        .set('Origin', identity.webOrigin)
+        .set('Authorization', `Bearer ${number}`)
+    ).status,
+    401,
+  );
+  for (const body of [
+    { publicNumber: '99999999' },
+    { public_number: 99999999 },
+    { publicId: number },
+  ])
+    assert.equal((await f.call('patch', '/users/me', body)).status, 422);
+  const edit = await f
+    .call('patch', '/users/me', { leagueName: 'Liga' })
+    .set('Accept', media);
+  assert.equal(edit.body.profile.publicNumber, number);
+  const otherOwn = await other.call('get', '/users/me').set('Accept', media);
+  assert.notEqual(otherOwn.body.profile.publicNumber, number);
+  const page = await f.call('get', '/users?search=pf_&limit=1');
+  assert.ok(page.body.nextCursor);
+  const next = await f
+    .call('get', `/users?search=pf_&limit=1&cursor=${page.body.nextCursor}`)
+    .set('Accept', media);
+  assert.equal(next.status, 200);
+  assert.match(next.body.items[0].publicNumber, /^[1-9][0-9]{7}$/);
+  // Un username de ocho dígitos no cambia el significado del filtro search.
+  const numericName = otherOwn.body.profile.publicNumber;
+  await f.call('patch', '/users/me', { username: numericName });
+  const byName = await f
+    .call('get', `/users?search=${numericName}`)
+    .set('Accept', media);
+  const byId = await f
+    .call('get', `/users?publicNumber=${numericName}`)
+    .set('Accept', media);
+  assert.equal(byName.body.items[0].publicId, f.user.publicId);
+  assert.equal(byId.body.items[0].publicId, other.user.publicId);
+});
+
 test('perfiles reales: usernames concurrentes y búsqueda con prefijo literal/cursor firmado', async () => {
   const a = await fixture();
   const b = await fixture();

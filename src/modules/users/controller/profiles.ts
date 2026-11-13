@@ -16,6 +16,21 @@ import { createBrowserCsrf } from '../../../shared/middleware/browser-csrf.js';
 import { ApiError } from '../../../shared/errors/api-error.js';
 
 let uploads = 0;
+export const NUMERIC_PROFILE_MEDIA = 'application/vnd.fcmatch.identity.v2+json';
+function numericProfile(req: Request, res: Response) {
+  res.vary('Accept');
+  const numeric =
+    req.accepts([NUMERIC_PROFILE_MEDIA, 'application/json']) ===
+      NUMERIC_PROFILE_MEDIA &&
+    (req.get('Accept') ?? '').toLowerCase().includes(NUMERIC_PROFILE_MEDIA);
+  return numeric;
+}
+function profileJson(req: Request, res: Response, profile: unknown) {
+  // Negociar el Content-Type solo tras completar el servicio: los errores
+  // conservan application/json y el contrato uniforme anterior.
+  if (numericProfile(req, res)) res.type(NUMERIC_PROFILE_MEDIA);
+  res.json(profile);
+}
 
 function access(req: Request) {
   const value = req.get('Authorization') ?? '';
@@ -125,33 +140,60 @@ export function profilesController(
   return {
     async own(req: Request, res: Response) {
       parseDto(emptySchema, req.query);
-      res.json(await service.own(access(req), readContext(req)));
+      profileJson(
+        req,
+        res,
+        await service.own(
+          access(req),
+          readContext(req),
+          numericProfile(req, res),
+        ),
+      );
     },
     async publicProfile(req: Request, res: Response) {
       parseDto(emptySchema, req.query);
-      res.json(
-        await service.publicProfile(parseDto(publicId, req.params['publicId'])),
+      profileJson(
+        req,
+        res,
+        await service.publicProfile(
+          parseDto(publicId, req.params['publicId']),
+          numericProfile(req, res),
+        ),
       );
     },
     async patch(req: Request, res: Response) {
-      res.json(
+      profileJson(
+        req,
+        res,
         await service.patch(
           access(req),
           csrf.verify(req),
           parseDto(profilePatch, req.body),
+          numericProfile(req, res),
         ),
       );
     },
     async search(req: Request, res: Response) {
       const input = parseDto(profileSearch, req.query);
-      res.json(
-        await service.search(
-          access(req),
-          readContext(req),
-          input.search,
-          input.limit,
-          input.cursor,
-        ),
+      const numeric = numericProfile(req, res);
+      profileJson(
+        req,
+        res,
+        input.publicNumber
+          ? await service.searchNumber(
+              access(req),
+              readContext(req),
+              input.publicNumber,
+              numeric,
+            )
+          : await service.search(
+              access(req),
+              readContext(req),
+              input.search!,
+              input.limit,
+              input.cursor,
+              numeric,
+            ),
       );
     },
     async replace(req: Request, res: Response) {
@@ -197,8 +239,15 @@ export function profilesController(
     },
     async confirmEmail(req: Request, res: Response) {
       const input = parseDto(verificationSchema, req.body);
-      res.json(
-        await service.confirmEmail(access(req), csrf.verify(req), input.token),
+      profileJson(
+        req,
+        res,
+        await service.confirmEmail(
+          access(req),
+          csrf.verify(req),
+          input.token,
+          numericProfile(req, res),
+        ),
       );
     },
   };

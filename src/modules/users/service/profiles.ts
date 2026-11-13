@@ -55,9 +55,10 @@ export class ProfilesService {
       throw unavailable();
     }
   }
-  private async view(row: ProfileRow, own = false) {
+  private async view(row: ProfileRow, own = false, numeric = false) {
     const profile = {
       publicId: row.public_id,
+      ...(numeric ? { publicNumber: String(row.public_number) } : {}),
       username: row.username,
       leagueName: row.league_name,
       avatar: row.avatar_key
@@ -78,7 +79,7 @@ export class ProfilesService {
     if (!this.storage) throw unavailable();
     return this.storage;
   }
-  async own(access: string, context: BrowserContext) {
+  async own(access: string, context: BrowserContext, numeric = false) {
     return this.safe(async () => {
       const row = await this.sessions.authorized(
         access,
@@ -87,16 +88,18 @@ export class ProfilesService {
         true,
       );
       if (!row) throw unauthenticated();
-      return this.view(row, true);
+      return this.view(row, true, numeric);
     });
   }
-  async publicProfile(id: string) {
+  async publicProfile(id: string, numeric = false) {
     return this.safe(async () => {
       const row = await this.repo.transaction((client) =>
-        this.repo.publicProfile(client, id),
+        /^[1-9][0-9]{7}$/.test(id)
+          ? this.repo.byPublicNumber(client, id)
+          : this.repo.publicProfile(client, id),
       );
       if (!row) throw new ApiError(404, 'NOT_FOUND', 'Perfil no encontrado.');
-      return this.view(row);
+      return this.view(row, false, numeric);
     });
   }
   async patch(
@@ -106,6 +109,7 @@ export class ProfilesService {
       username?: string | undefined;
       leagueName?: string | null | undefined;
     },
+    numeric = false,
   ) {
     return this.safe(async () => {
       const row = await this.sessions.authorized(
@@ -114,7 +118,7 @@ export class ProfilesService {
         (client, user) =>
           this.safe(() => this.repo.patch(client, user.id, input)),
       );
-      return this.view(row, true);
+      return this.view(row, true, numeric);
     });
   }
   private mac(value: string) {
@@ -128,6 +132,7 @@ export class ProfilesService {
     search: string,
     limit: number,
     cursor?: string,
+    numeric = false,
   ) {
     return this.safe(async () => {
       let after: z.infer<typeof cursorData> | undefined;
@@ -174,8 +179,29 @@ export class ProfilesService {
         nextCursor = `${value}.${this.mac(value)}`;
       }
       return {
-        items: await Promise.all(page.map((row) => this.view(row))),
+        items: await Promise.all(
+          page.map((row) => this.view(row, false, numeric)),
+        ),
         nextCursor,
+      };
+    });
+  }
+  async searchNumber(
+    access: string,
+    context: BrowserContext,
+    number: string,
+    numeric = false,
+  ) {
+    return this.safe(async () => {
+      const row = await this.sessions.authorized(
+        access,
+        context,
+        (client) => this.repo.byPublicNumber(client, number),
+        true,
+      );
+      return {
+        items: row ? [await this.view(row, false, numeric)] : [],
+        nextCursor: null,
       };
     });
   }
@@ -266,7 +292,12 @@ export class ProfilesService {
       if (send) await this.deliver({ email: destination, token });
     });
   }
-  async confirmEmail(access: string, context: BrowserContext, token: string) {
+  async confirmEmail(
+    access: string,
+    context: BrowserContext,
+    token: string,
+    numeric = false,
+  ) {
     return this.safe(async () => {
       const row = await this.sessions.authorized(
         access,
@@ -289,7 +320,7 @@ export class ProfilesService {
           return (await this.repo.own(client, user.id))!;
         },
       );
-      return this.view(row, true);
+      return this.view(row, true, numeric);
     });
   }
 }

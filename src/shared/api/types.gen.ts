@@ -101,6 +101,38 @@ export type Avatar = {
     expiresAt: string;
 };
 
+/**
+ * Identificador público generado por backend, único, permanente e inmutable. No es una credencial ni autoriza operaciones. No se recicla.
+ */
+export type PublicNumber = string;
+
+export type NumericPublicProfile = {
+    /**
+     * UUID público anterior, conservado exclusivamente para compatibilidad. No mostrar en clientes nuevos.
+     */
+    readonly publicId: string;
+    readonly publicNumber: PublicNumber;
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    statistics: null;
+    history: Array<unknown>;
+};
+
+export type NumericOwnProfile = {
+    profile: NumericPublicProfile;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type NumericUsersPage = {
+    items: Array<NumericPublicProfile>;
+    /**
+     * Cursor firmado UUID anterior, sin cambios de formato ni ordenación.
+     */
+    nextCursor: string | null;
+};
+
 export type PublicProfile = {
     /**
      * Generado por backend, único, estable y no editable.
@@ -172,6 +204,28 @@ export type ChangePasswordRequestWritable = {
 export type EmailChangeRequestWritable = {
     newEmail: Email;
     currentPassword: CurrentPassword;
+};
+
+export type NumericPublicProfileWritable = {
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    statistics: null;
+    history: Array<unknown>;
+};
+
+export type NumericOwnProfileWritable = {
+    profile: NumericPublicProfileWritable;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type NumericUsersPageWritable = {
+    items: Array<NumericPublicProfileWritable>;
+    /**
+     * Cursor firmado UUID anterior, sin cambios de formato ni ordenación.
+     */
+    nextCursor: string | null;
 };
 
 export type PublicProfileWritable = {
@@ -974,11 +1028,15 @@ export type ReplaceMyAvatarResponse = ReplaceMyAvatarResponses[keyof ReplaceMyAv
 export type SearchUsersData = {
     body?: never;
     path?: never;
-    query: {
+    query?: {
         /**
-         * Prefijo de username, insensible a mayúsculas; no busca por correo.
+         * Prefijo de username, insensible a mayúsculas; excluyente con publicNumber. No busca por correo.
          */
-        search: string;
+        search?: string;
+        /**
+         * ID numérico exacto; excluyente con search y cursor. Un username numérico sigue buscándose con search.
+         */
+        publicNumber?: PublicNumber;
         limit?: number;
         /**
          * Cursor opaco devuelto por la página anterior para la misma búsqueda.
@@ -1017,7 +1075,7 @@ export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponse
 export type GetPublicProfileData = {
     body?: never;
     path: {
-        publicId: string;
+        publicId: string | PublicNumber;
     };
     query?: never;
     url: '/users/{publicId}';
