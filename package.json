@@ -26,8 +26,8 @@
     "check": "npm run skills:check && npm run typecheck && npm run lint && npm run format:check && npm run api:lint && npm test && npm run test:integration && npm run build"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1168.0",
-    "@aws-sdk/s3-request-presigner": "^3.1168.0",
+    "@aws-sdk/client-s3": "^3.1169.0",
+    "@aws-sdk/s3-request-presigner": "^3.1169.0",
     "argon2": "^0.45.2",
     "busboy": "^1.6.0",
     "cors": "^2.8.6",
