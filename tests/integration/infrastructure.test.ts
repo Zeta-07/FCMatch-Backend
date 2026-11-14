@@ -24,6 +24,7 @@ test('PostgreSQL real: migraciones repetibles, UTC y health', async () => {
     dir: 'migrations',
     direction: 'up' as const,
     migrationsTable: 'schema_migrations',
+    advisoryLockMode: 'wait' as const,
     log: () => {},
   };
   await runner(options);
