@@ -289,6 +289,11 @@ test('contrato identidad: rechaza asignación masiva y documenta límites de car
     assert.ok(avatar.responses[code]);
   }
   const search = operation('/users', 'get');
+  for (const name of ['query', 'search', 'publicNumber', 'cursor'])
+    assert.ok(search.parameters?.some((p) => p.name === name));
+  const unified = search.parameters?.find((p) => p.name === 'query')?.schema;
+  assert.equal(unified?.minLength, 2);
+  assert.equal(unified?.maxLength, 30);
   assert.equal(
     search.parameters?.find((p) => p.name === 'limit')?.schema?.maximum,
     50,

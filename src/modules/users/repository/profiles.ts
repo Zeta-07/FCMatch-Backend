@@ -72,14 +72,21 @@ export class ProfilesRepository extends IdentityRepository {
     prefix: string,
     limit: number,
     after?: { username: string; publicId: string },
+    number: number | null = null,
   ) {
     const escaped = prefix.replace(/[\\%_]/g, '\\$&') + '%';
     return (
       await client.query<ProfileRow>(
         `SELECT ${columns} FROM fcmatch.users
-      WHERE lower(username) LIKE $1 COLLATE "C" AND ($2::text IS NULL OR (lower(username) COLLATE "C", public_id) > ($2 COLLATE "C", $3::uuid))
+      WHERE (lower(username) LIKE $1 COLLATE "C" OR public_number = $5::integer) AND ($2::text IS NULL OR (lower(username) COLLATE "C", public_id) > ($2 COLLATE "C", $3::uuid))
       ORDER BY lower(username) COLLATE "C", public_id LIMIT $4`,
-        [escaped, after?.username ?? null, after?.publicId ?? null, limit + 1],
+        [
+          escaped,
+          after?.username ?? null,
+          after?.publicId ?? null,
+          limit + 1,
+          number,
+        ],
       )
     ).rows;
   }

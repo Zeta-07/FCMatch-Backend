@@ -30,6 +30,7 @@ const cursorData = z.strictObject({
   search: z.string(),
   username: z.string().regex(/^[a-z0-9_]{3,30}$/),
   publicId: z.uuid(),
+  mode: z.literal('unified').optional(),
 });
 export class ProfilesService {
   constructor(
@@ -133,12 +134,15 @@ export class ProfilesService {
     limit: number,
     cursor?: string,
     numeric = false,
+    unified = false,
   ) {
     return this.safe(async () => {
       let after: z.infer<typeof cursorData> | undefined;
       if (cursor) {
         try {
-          const [value, signature] = cursor.split('.');
+          const parts = cursor.split('.');
+          if (parts.length !== 2) throw new Error();
+          const [value, signature] = parts;
           const expected = this.mac(value!);
           if (
             !signature ||
@@ -149,7 +153,8 @@ export class ProfilesService {
           after = cursorData.parse(
             JSON.parse(Buffer.from(value!, 'base64url').toString()),
           );
-          if (after.search !== search) throw new Error();
+          if (after.search !== search || (after.mode === 'unified') !== unified)
+            throw new Error();
         } catch {
           throw new ApiError(
             422,
@@ -161,7 +166,14 @@ export class ProfilesService {
       const rows = await this.sessions.authorized(
         access,
         context,
-        (client) => this.repo.search(client, search, limit, after),
+        (client) =>
+          this.repo.search(
+            client,
+            search,
+            limit,
+            after,
+            unified && /^[1-9][0-9]{7}$/.test(search) ? Number(search) : null,
+          ),
         true,
       );
       const more = rows.length > limit;
@@ -174,6 +186,7 @@ export class ProfilesService {
             search,
             username: last.username.toLowerCase(),
             publicId: last.public_id,
+            ...(unified ? { mode: 'unified' } : {}),
           }),
         ).toString('base64url');
         nextCursor = `${value}.${this.mac(value)}`;

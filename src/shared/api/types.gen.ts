@@ -1030,11 +1030,15 @@ export type SearchUsersData = {
     path?: never;
     query?: {
         /**
-         * Prefijo de username, insensible a mayúsculas; excluyente con publicNumber. No busca por correo.
+         * Búsqueda unificada; recorta espacios exteriores. Ocho dígitos buscan también el ID exacto; ceros iniciales solo pueden coincidir con username. Excluyente con search y publicNumber. Admite cursor de la misma consulta unificada.
+         */
+        query?: string;
+        /**
+         * Prefijo de username, insensible a mayúsculas; excluyente con publicNumber y query. No busca por correo.
          */
         search?: string;
         /**
-         * ID numérico exacto; excluyente con search y cursor. Un username numérico sigue buscándose con search.
+         * ID numérico exacto; excluyente con search, query y cursor. Un username numérico sigue buscándose con search.
          */
         publicNumber?: PublicNumber;
         limit?: number;

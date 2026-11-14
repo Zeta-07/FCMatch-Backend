@@ -189,10 +189,11 @@ export function profilesController(
           : await service.search(
               access(req),
               readContext(req),
-              input.search!,
+              input.query ?? input.search!,
               input.limit,
               input.cursor,
               numeric,
+              input.query !== undefined,
             ),
       );
     },

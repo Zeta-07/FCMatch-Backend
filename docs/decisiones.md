@@ -1,5 +1,13 @@
 # Decisiones técnicas — Fase 0
 
+## DT-016 — Búsqueda unificada retrocompatible (ajustes finales Etapa 6)
+
+El propietario aprueba un campo único, envío manual y ambigüedad numérica sin perder páginas. GET /users añade query (2–30 caracteres ASCII de username, trim exterior, minúsculas), excluyente con search y publicNumber. El servicio habilita ID exacto solo ante ocho dígitos del rango válido; el repositorio combina con OR parametrizado y paginación keyset sobre el conjunto completo. Una fila que coincide por ambos criterios aparece una vez; se mantiene el orden por lower(username) COLLATE C y public_id. Ceros iniciales buscan username, no se convierten en otro ID. No se excluye al titular, no se exponen correo ni ID interno y no cambia autenticación, rate limiting, representación JSON ni datos persistidos. Sin migración.
+
+Cursor HMAC nuevo incluye mode=unified y consulta normalizada; se rechaza su uso con search y viceversa, otra consulta, firma falsa o segmentos extra. Los cursores antiguos sin mode siguen funcionando exclusivamente con search. No se añaden ranking, offsets, búsqueda por correo, motor adicional ni segundo endpoint. El cliente no fusiona búsquedas. OpenAPI y modelos se distribuyen idénticos a los tres clientes. Referencias: Frontend DT-014 y AdminWeb DT-013.
+
+Inventario de herramientas: Node 26.13.0/npm 12.2.2, Ionic Angular/Core 9.0.11, CLI Angular 22.2.7. Se mantienen las excepciones de Angular 22.2.4/TypeScript 6.0.3 ya aprobadas; SDK AWS actualizable estable 3.1169.0, mantenimiento separado y validado con S3 real. El diagnóstico genérico npm exec ionic resolvió una CLI legacy en caché temporal; no es dependencia del proyecto ni se usa para construir/verificar; la versión válida del framework se obtiene de npm ls.
+
 ## DT-015 — Etapa 6: número público y compatibilidad explícita
 
 El propietario aprueba corregir Etapa 6, sin aprobarla definitivamente ni avanzar a Etapa 7. Se conserva `users.id` UUID interno y `public_id` UUID anterior. Se añade `public_number` integer, único e inmutable, rango 10000000–99999999, secuencia NO CYCLE: 90 millones de asignaciones, huecos válidos y sin reciclado tras eliminación o rollback de una transacción. No se emplea como credencial, JWT subject, permiso ni relación interna. El acceso público sigue limitado y no expone correo, ID interno ni sesiones; la numeración es enumerable, no secreta. La API asigna automáticamente mediante el default de PostgreSQL y rechaza asignación masiva en registro/edición.

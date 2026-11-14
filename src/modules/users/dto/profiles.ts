@@ -29,10 +29,20 @@ export const profileSearch = z
       .transform((v) => v.toLowerCase())
       .optional(),
     publicNumber: publicNumber.optional(),
+    query: z
+      .string()
+      .trim()
+      .regex(/^[A-Za-z0-9_]{2,30}$/)
+      .transform((v) => v.toLowerCase())
+      .optional(),
     limit: z.coerce.number().int().min(1).max(50).default(20),
     cursor: z.string().min(1).max(512).optional(),
   })
-  .refine((v) => Boolean(v.search) !== Boolean(v.publicNumber))
+  .refine(
+    (v) =>
+      [v.search, v.publicNumber, v.query].filter((value) => value !== undefined)
+        .length === 1,
+  )
   .refine((v) => !v.publicNumber || !v.cursor);
 export const publicId = z.union([z.uuid(), publicNumber]);
 export const emailChange = z.strictObject({

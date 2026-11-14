@@ -545,12 +545,20 @@ paths:
       tags: [Perfiles]
       x-implementation-status: implemented
       summary: Buscar perfiles por username o ID numérico desde una sesión verificada
-      description: Enviar exactamente search o publicNumber. El ID numérico es una coincidencia exacta sin cursor. Accept application/vnd.fcmatch.identity.v2+json añade publicNumber; application/json conserva el contrato anterior y los cursores UUID.
+      description: Enviar exactamente uno de query, search o publicNumber. query combina prefijo de username insensible a mayúsculas e ID público exacto cuando tiene ocho dígitos válidos, sin duplicados y sin excluir al titular. Orden por username normalizado y UUID público; cursor firmado vinculado a consulta y modo. search y publicNumber conservan su comportamiento y cursores anteriores. Accept application/vnd.fcmatch.identity.v2+json añade publicNumber; application/json conserva el contrato anterior.
       parameters:
+        - name: query
+          in: query
+          description: Búsqueda unificada; recorta espacios exteriores. Ocho dígitos buscan también el ID exacto; ceros iniciales solo pueden coincidir con username. Excluyente con search y publicNumber. Admite cursor de la misma consulta unificada.
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 30
+            pattern: '^[A-Za-z0-9_]+$'
         - name: search
           in: query
           required: false
-          description: Prefijo de username, insensible a mayúsculas; excluyente con publicNumber. No busca por correo.
+          description: Prefijo de username, insensible a mayúsculas; excluyente con publicNumber y query. No busca por correo.
           schema:
             type: string
             minLength: 2
@@ -558,7 +566,7 @@ paths:
             pattern: '^[A-Za-z0-9_]+$'
         - name: publicNumber
           in: query
-          description: ID numérico exacto; excluyente con search y cursor. Un username numérico sigue buscándose con search.
+          description: ID numérico exacto; excluyente con search, query y cursor. Un username numérico sigue buscándose con search.
           schema:
             $ref: '#/components/schemas/PublicNumber'
         - name: limit

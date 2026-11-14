@@ -497,6 +497,78 @@ test('ID numérico real: negociación, enlaces UUID, privacidad, búsqueda exact
   assert.equal(byId.body.items[0].publicId, other.user.publicId);
 });
 
+test('búsqueda unificada real: ambigüedad, titular, deduplicación, paginación y contratos anteriores', async () => {
+  const f = await fixture(numericApp);
+  const other = await fixture(numericApp);
+  const media = 'application/vnd.fcmatch.identity.v2+json';
+  const own = await f.call('get', '/users/me').set('Accept', media);
+  const number = own.body.profile.publicNumber as string;
+  await other.call('patch', '/users/me', { username: number });
+  const get = (query: string) =>
+    f.call('get', `/users?${query}`).set('Accept', media);
+  const first = await get(`query=${number}&limit=1`);
+  assert.equal(first.status, 200);
+  assert.equal(first.body.items[0].publicId, other.user.publicId);
+  assert.ok(first.body.nextCursor);
+  assert.equal(
+    (await get(`query=${number}&cursor=${first.body.nextCursor}.extra`)).status,
+    422,
+  );
+  const forged = first.body.nextCursor.slice(0, -3) + 'abc';
+  assert.equal((await get(`query=${number}&cursor=${forged}`)).status, 422);
+  const second = await get(
+    `query=${number}&limit=1&cursor=${first.body.nextCursor}`,
+  );
+  assert.equal(second.status, 200);
+  assert.equal(second.body.items[0].publicId, f.user.publicId);
+  assert.equal(second.body.nextCursor, null);
+  assert.equal((await get(`search=${number}`)).body.items.length, 1);
+  assert.equal(
+    (await get(`publicNumber=${number}`)).body.items[0].publicId,
+    f.user.publicId,
+  );
+  assert.equal(
+    (await get(`search=${number}&cursor=${first.body.nextCursor}`)).status,
+    422,
+  );
+  assert.equal(
+    (await get(`query=another&cursor=${first.body.nextCursor}`)).status,
+    422,
+  );
+  const legacy = await get('search=pf_&limit=1');
+  assert.ok(legacy.body.nextCursor);
+  assert.equal(
+    (await get(`query=pf_&cursor=${legacy.body.nextCursor}`)).status,
+    422,
+  );
+  assert.equal(
+    (await get(`search=pf_&cursor=${legacy.body.nextCursor}`)).status,
+    200,
+  );
+  for (const invalid of [
+    'query=ab&search=ab',
+    `query=ab&publicNumber=${number}`,
+    'query=',
+    'query=a',
+    'query=ab&query=cd',
+    'query=%27OR1',
+  ])
+    assert.equal((await get(invalid)).status, 422);
+  await other.call('patch', '/users/me', { username: '0' + number.slice(1) });
+  const zeros = await get(`query=0${number.slice(1)}`);
+  assert.equal(zeros.status, 200);
+  assert.equal(zeros.body.items[0].publicId, other.user.publicId);
+  await f.call('patch', '/users/me', { username: number });
+  const both = await get(`query=${number}`);
+  assert.equal(both.body.items.length, 1);
+  assert.equal(both.body.items[0].publicId, f.user.publicId);
+  assert.equal(both.body.items[0].email, undefined);
+  const normalized = await get(`query=%20${number}%20`);
+  assert.deepEqual(normalized.body.items, both.body.items);
+  const plain = await f.call('get', `/users?query=${number}`);
+  assert.equal(plain.body.items[0].publicNumber, undefined);
+});
+
 test('perfiles reales: usernames concurrentes y búsqueda con prefijo literal/cursor firmado', async () => {
   const a = await fixture();
   const b = await fixture();
