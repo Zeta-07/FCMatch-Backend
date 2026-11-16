@@ -2,9 +2,9 @@
 
 ## Estado y autorización
 
-El propietario aprobó las Etapas 1–4 y autorizó exclusivamente Etapa 5: perfiles, búsqueda, cambio de correo y avatares. Las ocho operaciones restantes se incorporan en esta etapa; su validación completa se registra en `docs/fase-1-etapa-5-verificacion.md`. No hay interfaces de Etapa 6. Un tipo generado o un status del contrato no acredita por sí solo un flujo verificado.
+**Etapa 6 completada y aprobada visual y funcionalmente por el propietario el 16/11/2026.** Incluye Web Cliente y móvil en navegador, búsqueda unificada, perfiles/edición, navegación de regreso y temas. Las Etapas 1–5 y sus evidencias se conservan. El cierre técnico y la integración de los tres PR #5 hacia develop están expresamente autorizados; el estado de integración y los commits de fusión se consultan en los PR enlazados en `docs/fase-1-etapa-6-cierre.md`.
 
-Se permiten cambios y publicación en `feature/fase-1-identidad` únicamente tras verificaciones satisfactorias de Etapa 5, actualizando PR #5 existentes sin fusiones ni force push. Etapa 6 requiere nueva aprobación. Se conservan migraciones aplicadas y excepciones de Angular/TypeScript; incidencias de Etapa 1 son históricas.
+La autorización actual sustituye las restricciones históricas de mantener los PR #5 abiertos: permite fusionarlos a develop tras CI satisfactorio y ausencia de conflictos, conservando commits de fusión y sin eliminar ramas. No autoriza integrar develop en main ni iniciar Etapa 7. Se conservan migraciones aplicadas, excepciones de Angular/TypeScript y pendientes externos/nativos. Los apartados técnicos siguientes documentan criterios originales e historia de Etapas 1–5; sus expresiones de trabajo futuro no representan el estado actual de implementación.
 
 Decisiones expresas:
 
