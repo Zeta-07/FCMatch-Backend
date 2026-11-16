@@ -5,3 +5,4 @@ src/shared/api/
 docs/DERCAS.md
 AGENTS.md
 .opencode/skills/
+.local/

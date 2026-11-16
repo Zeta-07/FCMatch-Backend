@@ -4,6 +4,164 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:3000/api/v1' | (string & {});
 };
 
+/**
+ * Trim y minúsculas; sin eliminar puntos ni etiquetas + del proveedor.
+ */
+export type Email = string;
+
+/**
+ * Unicidad insensible a mayúsculas; se conserva la presentación elegida.
+ */
+export type Username = string;
+
+/**
+ * Sin truncamiento, trim ni normalización; admite frases y Unicode, sin reglas de composición.
+ */
+export type NewPassword = string;
+
+/**
+ * Entrada de autenticación; no aplicar retroactivamente nuevas reglas de alta.
+ */
+export type CurrentPassword = string;
+
+/**
+ * Secreto opaco de al menos 256 bits; nunca aparece en respuestas JSON.
+ */
+export type ActionToken = string;
+
+export type EmailRequest = {
+    email: Email;
+};
+
+export type RegisterRequest = {
+    email: Email;
+    username: Username;
+};
+
+export type LoginRequest = {
+    email: Email;
+};
+
+export type ActionTokenRequest = {
+    [key: string]: never;
+};
+
+export type ResetPasswordRequest = {
+    [key: string]: never;
+};
+
+export type ChangePasswordRequest = {
+    [key: string]: never;
+};
+
+export type EmailChangeRequest = {
+    newEmail: Email;
+};
+
+export type UpdateProfileRequest = {
+    username?: Username;
+    /**
+     * Texto simple; null elimina la liga. Rechazar cadena vacía tras trim.
+     */
+    leagueName?: string | null;
+};
+
+export type AcceptedRequest = {
+    message: 'Si la solicitud es válida, recibirás instrucciones. Si no llegan, podrás solicitar un nuevo envío.';
+};
+
+export type CsrfContext = {
+    csrfToken: string;
+    csrfExpiresAt: string;
+};
+
+export type BrowserSession = {
+    /**
+     * JWT; conservar solo en memoria, nunca en logs o almacenamiento persistente.
+     */
+    accessToken: string;
+    tokenType: 'Bearer';
+    /**
+     * Vida máxima del access en segundos, sin superar el vencimiento de la sesión.
+     */
+    expiresIn: number;
+    /**
+     * Límite absoluto de la familia, máximo 30 días desde login.
+     */
+    sessionExpiresAt: string;
+    csrfToken: string;
+    csrfExpiresAt: string;
+};
+
+export type Avatar = {
+    /**
+     * URL S3 firmada para lectura del avatar público, máximo 5 minutos. HTTPS en R2 previsto para producción; HTTP solo en 127.0.0.1 para S3 local de desarrollo/pruebas. Integración real R2 pendiente.
+     */
+    url: string;
+    expiresAt: string;
+};
+
+/**
+ * Identificador público generado por backend, único, permanente e inmutable. No es una credencial ni autoriza operaciones. No se recicla.
+ */
+export type PublicNumber = string;
+
+export type NumericPublicProfile = {
+    /**
+     * UUID público anterior, conservado exclusivamente para compatibilidad. No mostrar en clientes nuevos.
+     */
+    readonly publicId: string;
+    readonly publicNumber: PublicNumber;
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    statistics: null;
+    history: Array<unknown>;
+};
+
+export type NumericOwnProfile = {
+    profile: NumericPublicProfile;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type NumericUsersPage = {
+    items: Array<NumericPublicProfile>;
+    /**
+     * Cursor firmado UUID anterior, sin cambios de formato ni ordenación.
+     */
+    nextCursor: string | null;
+};
+
+export type PublicProfile = {
+    /**
+     * Generado por backend, único, estable y no editable.
+     */
+    readonly publicId: string;
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    /**
+     * Estado vacío de Fase 1; cálculo diferido a Fase 8, sin métricas inventadas.
+     */
+    statistics: null;
+    /**
+     * Vacío en Fase 1; historial competitivo diferido a Fase 8.
+     */
+    history: Array<unknown>;
+};
+
+export type OwnProfile = {
+    profile: PublicProfile;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type UsersPage = {
+    items: Array<PublicProfile>;
+    nextCursor: string | null;
+};
+
 export type Health = {
     status: 'ok';
     service: 'fcmatch-api';
@@ -17,6 +175,100 @@ export type ApiError = {
         details: Array<unknown>;
     };
 };
+
+export type RegisterRequestWritable = {
+    email: Email;
+    username: Username;
+    password: NewPassword;
+};
+
+export type LoginRequestWritable = {
+    email: Email;
+    password: CurrentPassword;
+};
+
+export type ActionTokenRequestWritable = {
+    token: ActionToken;
+};
+
+export type ResetPasswordRequestWritable = {
+    token: ActionToken;
+    newPassword: NewPassword;
+};
+
+export type ChangePasswordRequestWritable = {
+    currentPassword: CurrentPassword;
+    newPassword: NewPassword;
+};
+
+export type EmailChangeRequestWritable = {
+    newEmail: Email;
+    currentPassword: CurrentPassword;
+};
+
+export type NumericPublicProfileWritable = {
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    statistics: null;
+    history: Array<unknown>;
+};
+
+export type NumericOwnProfileWritable = {
+    profile: NumericPublicProfileWritable;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type NumericUsersPageWritable = {
+    items: Array<NumericPublicProfileWritable>;
+    /**
+     * Cursor firmado UUID anterior, sin cambios de formato ni ordenación.
+     */
+    nextCursor: string | null;
+};
+
+export type PublicProfileWritable = {
+    username: Username;
+    leagueName: string | null;
+    avatar: Avatar | null;
+    /**
+     * Estado vacío de Fase 1; cálculo diferido a Fase 8, sin métricas inventadas.
+     */
+    statistics: null;
+    /**
+     * Vacío en Fase 1; historial competitivo diferido a Fase 8.
+     */
+    history: Array<unknown>;
+};
+
+export type OwnProfileWritable = {
+    profile: PublicProfileWritable;
+    email: Email;
+    emailVerifiedAt: string;
+};
+
+export type UsersPageWritable = {
+    items: Array<PublicProfileWritable>;
+    nextCursor: string | null;
+};
+
+/**
+ * Origen navegador configurado. Solo en este GET se permite ausencia cuando
+ * Sec-Fetch-Site es same-origin y el origen público de API está configurado
+ * como cliente permitido; no inferirlo de un Host arbitrario o proxy no confiable.
+ *
+ */
+export type CsrfBootstrapOrigin = string;
+
+/**
+ * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+ */
+export type BrowserOrigin = string;
+
+export type Email2 = EmailRequest;
+
+export type ActionToken2 = ActionTokenRequestWritable;
 
 export type GetHealthData = {
     body?: never;
@@ -46,3 +298,815 @@ export type GetHealthResponses = {
 };
 
 export type GetHealthResponse = GetHealthResponses[keyof GetHealthResponses];
+
+export type GetBrowserCsrfData = {
+    body?: never;
+    headers?: {
+        /**
+         * Origen navegador configurado. Solo en este GET se permite ausencia cuando
+         * Sec-Fetch-Site es same-origin y el origen público de API está configurado
+         * como cliente permitido; no inferirlo de un Host arbitrario o proxy no confiable.
+         *
+         */
+        Origin?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/csrf';
+};
+
+export type GetBrowserCsrfErrors = {
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type GetBrowserCsrfError = GetBrowserCsrfErrors[keyof GetBrowserCsrfErrors];
+
+export type GetBrowserCsrfResponses = {
+    /**
+     * Contexto CSRF disponible; no almacenar la respuesta en caché.
+     */
+    200: CsrfContext;
+};
+
+export type GetBrowserCsrfResponse = GetBrowserCsrfResponses[keyof GetBrowserCsrfResponses];
+
+export type RegisterUserData = {
+    body: RegisterRequestWritable;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/register';
+};
+
+export type RegisterUserErrors = {
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * USERNAME_UNAVAILABLE; no devuelve ni permite consultar conflictos por correo.
+     */
+    409: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type RegisterUserError = RegisterUserErrors[keyof RegisterUserErrors];
+
+export type RegisterUserResponses = {
+    /**
+     * Solicitud aceptada para procesamiento; no confirma existencia de cuenta ni entrega SMTP.
+     */
+    202: AcceptedRequest;
+};
+
+export type RegisterUserResponse = RegisterUserResponses[keyof RegisterUserResponses];
+
+export type VerifyUserEmailData = {
+    body: ActionToken2;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/verify-email';
+};
+
+export type VerifyUserEmailErrors = {
+    /**
+     * ACTION_TOKEN_INVALID; token no utilizable, sin distinguir causa ni revelar cuentas.
+     */
+    400: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type VerifyUserEmailError = VerifyUserEmailErrors[keyof VerifyUserEmailErrors];
+
+export type VerifyUserEmailResponses = {
+    /**
+     * Operación completada sin cuerpo.
+     */
+    204: void;
+};
+
+export type VerifyUserEmailResponse = VerifyUserEmailResponses[keyof VerifyUserEmailResponses];
+
+export type ResendEmailVerificationData = {
+    body: Email2;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/resend-verification';
+};
+
+export type ResendEmailVerificationErrors = {
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type ResendEmailVerificationError = ResendEmailVerificationErrors[keyof ResendEmailVerificationErrors];
+
+export type ResendEmailVerificationResponses = {
+    /**
+     * Solicitud aceptada para procesamiento; no confirma existencia de cuenta ni entrega SMTP.
+     */
+    202: AcceptedRequest;
+};
+
+export type ResendEmailVerificationResponse = ResendEmailVerificationResponses[keyof ResendEmailVerificationResponses];
+
+export type LoginUserData = {
+    body: LoginRequestWritable;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/login';
+};
+
+export type LoginUserErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type LoginUserError = LoginUserErrors[keyof LoginUserErrors];
+
+export type LoginUserResponses = {
+    /**
+     * Access temporal en JSON; refresh únicamente en cookie HttpOnly.
+     */
+    200: BrowserSession;
+};
+
+export type LoginUserResponse = LoginUserResponses[keyof LoginUserResponses];
+
+export type RefreshBrowserSessionData = {
+    body?: never;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/refresh';
+};
+
+export type RefreshBrowserSessionErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type RefreshBrowserSessionError = RefreshBrowserSessionErrors[keyof RefreshBrowserSessionErrors];
+
+export type RefreshBrowserSessionResponses = {
+    /**
+     * Access temporal en JSON; refresh únicamente en cookie HttpOnly.
+     */
+    200: BrowserSession;
+};
+
+export type RefreshBrowserSessionResponse = RefreshBrowserSessionResponses[keyof RefreshBrowserSessionResponses];
+
+export type LogoutBrowserSessionData = {
+    body?: never;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutBrowserSessionErrors = {
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type LogoutBrowserSessionError = LogoutBrowserSessionErrors[keyof LogoutBrowserSessionErrors];
+
+export type LogoutBrowserSessionResponses = {
+    /**
+     * Sesión cerrada o ya ausente; cookies del cliente eliminadas.
+     */
+    204: void;
+};
+
+export type LogoutBrowserSessionResponse = LogoutBrowserSessionResponses[keyof LogoutBrowserSessionResponses];
+
+export type LogoutAllUserSessionsData = {
+    body?: never;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/logout-all';
+};
+
+export type LogoutAllUserSessionsErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type LogoutAllUserSessionsError = LogoutAllUserSessionsErrors[keyof LogoutAllUserSessionsErrors];
+
+export type LogoutAllUserSessionsResponses = {
+    /**
+     * Operación completada; sesiones revocadas, cookies actuales eliminadas, requiere nuevo login.
+     */
+    204: void;
+};
+
+export type LogoutAllUserSessionsResponse = LogoutAllUserSessionsResponses[keyof LogoutAllUserSessionsResponses];
+
+export type RequestPasswordResetData = {
+    body: Email2;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/forgot-password';
+};
+
+export type RequestPasswordResetErrors = {
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type RequestPasswordResetError = RequestPasswordResetErrors[keyof RequestPasswordResetErrors];
+
+export type RequestPasswordResetResponses = {
+    /**
+     * Solicitud aceptada para procesamiento; no confirma existencia de cuenta ni entrega SMTP.
+     */
+    202: AcceptedRequest;
+};
+
+export type RequestPasswordResetResponse = RequestPasswordResetResponses[keyof RequestPasswordResetResponses];
+
+export type ResetUserPasswordData = {
+    body: ResetPasswordRequestWritable;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/reset-password';
+};
+
+export type ResetUserPasswordErrors = {
+    /**
+     * ACTION_TOKEN_INVALID; token no utilizable, sin distinguir causa ni revelar cuentas.
+     */
+    400: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type ResetUserPasswordError = ResetUserPasswordErrors[keyof ResetUserPasswordErrors];
+
+export type ResetUserPasswordResponses = {
+    /**
+     * Operación completada; sesiones revocadas, cookies actuales eliminadas, requiere nuevo login.
+     */
+    204: void;
+};
+
+export type ResetUserPasswordResponse = ResetUserPasswordResponses[keyof ResetUserPasswordResponses];
+
+export type ChangeUserPasswordData = {
+    body: ChangePasswordRequestWritable;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/auth/change-password';
+};
+
+export type ChangeUserPasswordErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type ChangeUserPasswordError = ChangeUserPasswordErrors[keyof ChangeUserPasswordErrors];
+
+export type ChangeUserPasswordResponses = {
+    /**
+     * Operación completada; sesiones revocadas, cookies actuales eliminadas, requiere nuevo login.
+     */
+    204: void;
+};
+
+export type ChangeUserPasswordResponse = ChangeUserPasswordResponses[keyof ChangeUserPasswordResponses];
+
+export type GetMyProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type GetMyProfileErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type GetMyProfileError = GetMyProfileErrors[keyof GetMyProfileErrors];
+
+export type GetMyProfileResponses = {
+    /**
+     * Perfil y datos privados visibles exclusivamente para su titular.
+     */
+    200: OwnProfile;
+};
+
+export type GetMyProfileResponse = GetMyProfileResponses[keyof GetMyProfileResponses];
+
+export type UpdateMyProfileData = {
+    body: UpdateProfileRequest;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type UpdateMyProfileErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * USERNAME_UNAVAILABLE; no devuelve ni permite consultar conflictos por correo.
+     */
+    409: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type UpdateMyProfileError = UpdateMyProfileErrors[keyof UpdateMyProfileErrors];
+
+export type UpdateMyProfileResponses = {
+    /**
+     * Perfil y datos privados visibles exclusivamente para su titular.
+     */
+    200: OwnProfile;
+};
+
+export type UpdateMyProfileResponse = UpdateMyProfileResponses[keyof UpdateMyProfileResponses];
+
+export type RequestMyEmailChangeData = {
+    body: EmailChangeRequestWritable;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/email-change';
+};
+
+export type RequestMyEmailChangeErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type RequestMyEmailChangeError = RequestMyEmailChangeErrors[keyof RequestMyEmailChangeErrors];
+
+export type RequestMyEmailChangeResponses = {
+    /**
+     * Solicitud aceptada para procesamiento; no confirma existencia de cuenta ni entrega SMTP.
+     */
+    202: AcceptedRequest;
+};
+
+export type RequestMyEmailChangeResponse = RequestMyEmailChangeResponses[keyof RequestMyEmailChangeResponses];
+
+export type ConfirmMyEmailChangeData = {
+    body: ActionToken2;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/email-change/confirm';
+};
+
+export type ConfirmMyEmailChangeErrors = {
+    /**
+     * ACTION_TOKEN_INVALID; token no utilizable, sin distinguir causa ni revelar cuentas.
+     */
+    400: ApiError;
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type ConfirmMyEmailChangeError = ConfirmMyEmailChangeErrors[keyof ConfirmMyEmailChangeErrors];
+
+export type ConfirmMyEmailChangeResponses = {
+    /**
+     * Perfil y datos privados visibles exclusivamente para su titular.
+     */
+    200: OwnProfile;
+};
+
+export type ConfirmMyEmailChangeResponse = ConfirmMyEmailChangeResponses[keyof ConfirmMyEmailChangeResponses];
+
+export type DeleteMyAvatarData = {
+    body?: never;
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/avatar';
+};
+
+export type DeleteMyAvatarErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type DeleteMyAvatarError = DeleteMyAvatarErrors[keyof DeleteMyAvatarErrors];
+
+export type DeleteMyAvatarResponses = {
+    /**
+     * Operación completada sin cuerpo.
+     */
+    204: void;
+};
+
+export type DeleteMyAvatarResponse = DeleteMyAvatarResponses[keyof DeleteMyAvatarResponses];
+
+export type ReplaceMyAvatarData = {
+    body: {
+        file: Blob | File;
+    };
+    headers: {
+        /**
+         * Origen navegador de una lista exacta configurada; determina contexto web o móvil navegador, no permisos.
+         */
+        Origin: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/users/me/avatar';
+};
+
+export type ReplaceMyAvatarErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * ORIGIN_NOT_ALLOWED o CSRF_INVALID; rechazar antes de ejecutar la operación.
+     */
+    403: ApiError;
+    /**
+     * PAYLOAD_TOO_LARGE; archivo o petición demasiado grandes.
+     */
+    413: ApiError;
+    /**
+     * UNSUPPORTED_MEDIA_TYPE; formato de imagen no admitido.
+     */
+    415: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+    /**
+     * SERVICE_UNAVAILABLE; fallo de infraestructura, sin detalles de conexión ni cuenta.
+     */
+    503: ApiError;
+};
+
+export type ReplaceMyAvatarError = ReplaceMyAvatarErrors[keyof ReplaceMyAvatarErrors];
+
+export type ReplaceMyAvatarResponses = {
+    /**
+     * Avatar persistido; URL firmada de lectura temporal.
+     */
+    200: Avatar;
+};
+
+export type ReplaceMyAvatarResponse = ReplaceMyAvatarResponses[keyof ReplaceMyAvatarResponses];
+
+export type SearchUsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Búsqueda unificada; recorta espacios exteriores. Ocho dígitos buscan también el ID exacto; ceros iniciales solo pueden coincidir con username. Excluyente con search y publicNumber. Admite cursor de la misma consulta unificada.
+         */
+        query?: string;
+        /**
+         * Prefijo de username, insensible a mayúsculas; excluyente con publicNumber y query. No busca por correo.
+         */
+        search?: string;
+        /**
+         * ID numérico exacto; excluyente con search, query y cursor. Un username numérico sigue buscándose con search.
+         */
+        publicNumber?: PublicNumber;
+        limit?: number;
+        /**
+         * Cursor opaco devuelto por la página anterior para la misma búsqueda.
+         */
+        cursor?: string;
+    };
+    url: '/users';
+};
+
+export type SearchUsersErrors = {
+    /**
+     * UNAUTHENTICATED; acceso o credenciales no válidos, sin confirmar existencia de cuenta.
+     */
+    401: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type SearchUsersError = SearchUsersErrors[keyof SearchUsersErrors];
+
+export type SearchUsersResponses = {
+    /**
+     * Página de perfiles públicos; sin datos de autenticación.
+     */
+    200: UsersPage;
+};
+
+export type SearchUsersResponse = SearchUsersResponses[keyof SearchUsersResponses];
+
+export type GetPublicProfileData = {
+    body?: never;
+    path: {
+        publicId: string | PublicNumber;
+    };
+    query?: never;
+    url: '/users/{publicId}';
+};
+
+export type GetPublicProfileErrors = {
+    /**
+     * NOT_FOUND; perfil no encontrado.
+     */
+    404: ApiError;
+    /**
+     * VALIDATION_ERROR; entrada inválida, sin reproducir secretos en details.
+     */
+    422: ApiError;
+    /**
+     * RATE_LIMITED; límite de solicitudes sin distinción de existencia de cuenta.
+     */
+    429: ApiError;
+};
+
+export type GetPublicProfileError = GetPublicProfileErrors[keyof GetPublicProfileErrors];
+
+export type GetPublicProfileResponses = {
+    /**
+     * Perfil público; correo y datos de sesión excluidos.
+     */
+    200: PublicProfile;
+};
+
+export type GetPublicProfileResponse = GetPublicProfileResponses[keyof GetPublicProfileResponses];
